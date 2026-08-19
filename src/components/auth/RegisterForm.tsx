@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useRef } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Loader2, UserPlus } from "lucide-react"
 
 export default function RegisterForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -14,6 +15,14 @@ export default function RegisterForm() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // 注册成功后登录页保留 callbackUrl（站内相对路径校验）
+  const rawCallback = searchParams.get("callbackUrl") || "/"
+  const callbackUrl =
+    rawCallback.startsWith("/") && !rawCallback.startsWith("//")
+      ? rawCallback
+      : "/"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,7 +45,7 @@ export default function RegisterForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email: email.trim(), password }),
       })
 
       const data = await res.json()
@@ -48,8 +57,10 @@ export default function RegisterForm() {
       }
 
       setSuccess("注册成功！正在跳转到登录页...")
-      setTimeout(() => {
-        router.push("/auth/login")
+      // 成功分支也要恢复按钮状态，避免永久停在"注册中..."
+      setLoading(false)
+      redirectTimer.current = setTimeout(() => {
+        router.push(`/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`)
       }, 1500)
     } catch {
       setError("网络错误，请稍后重试")
@@ -85,7 +96,9 @@ export default function RegisterForm() {
           </label>
           <input
             id="name"
+            name="name"
             type="text"
+            autoComplete="nickname"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -103,7 +116,9 @@ export default function RegisterForm() {
           </label>
           <input
             id="email"
+            name="email"
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -121,7 +136,9 @@ export default function RegisterForm() {
           </label>
           <input
             id="password"
+            name="password"
             type="password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -139,7 +156,9 @@ export default function RegisterForm() {
           </label>
           <input
             id="confirmPassword"
+            name="confirmPassword"
             type="password"
+            autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required

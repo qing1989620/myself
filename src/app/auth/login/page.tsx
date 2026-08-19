@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense, ViewTransition } from "react"
 import LoginForm from "@/components/auth/LoginForm"
 
 export const metadata: Metadata = {
@@ -7,8 +8,12 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-      <LoginForm />
-    </div>
+    <ViewTransition enter="auto" exit="auto" default="none">
+      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
+        <Suspense>
+          <LoginForm />
+        </Suspense>
+      </div>
+    </ViewTransition>
   )
 }

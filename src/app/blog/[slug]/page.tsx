@@ -1,7 +1,8 @@
 import type { Metadata } from "next"
+import { ViewTransition } from "react"
 import { notFound } from "next/navigation"
-import { cookies } from "next/headers"
 import ArticleContent from "@/components/blog/ArticleContent"
+import ArticleViewTracker from "@/components/blog/ArticleViewTracker"
 import CommentSection from "@/components/comment/CommentSection"
 import { prisma } from "@/lib/prisma"
 import { formatDate, estimateReadTime } from "@/lib/utils"
@@ -18,20 +19,8 @@ async function getArticle(slug: string) {
 
   if (!article) return null
 
-  // 查看计数去重（读取 API 路由设置的 cookie，避免 SSR 重复计数）
-  const cookieStore = await cookies()
-  const viewedKey = `viewed_${article.id}`
-  const alreadyViewed = cookieStore.get(viewedKey)
-
-  if (!alreadyViewed) {
-    await prisma.article.update({
-      where: { id: article.id },
-      data: { viewCount: { increment: 1 } },
-    })
-    // 注意：Server Component 无法设置 cookie，由 API 路由 /api/articles/[id] 负责设置
-  }
-
-  return { ...article, viewCount: article.viewCount + (alreadyViewed ? 0 : 1) }
+  // 浏览量计数已迁移到客户端：挂载后由 /api/articles/[id] 计数并写去重 cookie
+  return article
 }
 
 async function getComments(articleId: number) {
@@ -101,39 +90,44 @@ export default async function BlogDetailPage({
   const readTime = estimateReadTime(article.content)
 
   return (
-    <article className="max-w-3xl mx-auto px-4 py-16">
-      {/* Header */}
-      <header className="mb-10 space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
-          {article.title}
-        </h1>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-          <span className="font-medium text-gray-700">
-            {article.author.name}
-          </span>
-          <span>{formatDate(article.createdAt)}</span>
-          <span>·</span>
-          <span>{readTime} 分钟阅读</span>
-          <span>·</span>
-          <span>{article.viewCount} 次阅读</span>
+    <ViewTransition enter="auto" exit="auto" default="none">
+      <article className="max-w-3xl mx-auto px-4 py-16">
+        {/* Header */}
+        <header className="mb-10 space-y-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+            {article.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+            <span className="font-medium text-gray-700">
+              {article.author.name}
+            </span>
+            <span>{formatDate(article.createdAt)}</span>
+            <span>·</span>
+            <span>{readTime} 分钟阅读</span>
+            <span>·</span>
+            <ArticleViewTracker
+              articleId={article.id}
+              initialViewCount={article.viewCount}
+            />
+          </div>
+          {article.summary && (
+            <p className="text-lg text-gray-500 italic border-l-4 border-accent pl-4">
+              {article.summary}
+            </p>
+          )}
+        </header>
+
+        {/* Content */}
+        <div className="prose-custom">
+          <ArticleContent content={article.content} />
         </div>
-        {article.summary && (
-          <p className="text-lg text-gray-500 italic border-l-4 border-accent pl-4">
-            {article.summary}
-          </p>
-        )}
-      </header>
 
-      {/* Content */}
-      <div className="prose-custom">
-        <ArticleContent content={article.content} />
-      </div>
+        {/* Divider */}
+        <hr className="my-12 border-gray-200" />
 
-      {/* Divider */}
-      <hr className="my-12 border-gray-200" />
-
-      {/* Comments */}
-      <CommentSection articleId={article.id} initialComments={comments} />
-    </article>
+        {/* Comments */}
+        <CommentSection articleId={article.id} initialComments={comments} />
+      </article>
+    </ViewTransition>
   )
 }

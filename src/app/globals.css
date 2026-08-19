@@ -36,6 +36,10 @@
   --color-brand-slate: #5c554d;
   --color-brand-light: #e5e0d7;
   --color-brand-white: #faf8f5;
+
+  /* Accent — Tailwind 4 只为 @theme 中的 --color-* 生成工具类 */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
 }
 
 :root {
@@ -52,7 +56,10 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: var(--font-serif), "Noto Serif SC", "STKaiti", "KaiTi", "SimSun", "PingFang SC", "Microsoft YaHei", sans-serif;
+  /* 中文字体栈：思源宋体（若系统安装）→ 系统宋体（Win: SimSun / macOS: Songti SC）→ 楷体/黑体兜底 */
+  font-family: var(--font-serif), "Noto Serif SC", "Source Han Serif SC",
+    "Source Han Serif CN", "Songti SC", "STSong", "SimSun", "STKaiti",
+    "KaiTi", "PingFang SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -66,6 +73,108 @@ body {
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;
+}
+
+/* 尊重系统"减少动态效果"设置 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* -- View Transitions（页面切换丝滑过渡）-- */
+/* 过渡期间保持页面可交互 */
+::view-transition {
+  pointer-events: none;
+}
+/* 默认柔和 crossfade，水墨风格的低调过渡 */
+::view-transition-old(root) {
+  animation: vt-fade-out 180ms ease both;
+}
+::view-transition-new(root) {
+  animation: vt-fade-in 260ms ease both;
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* -- 通用微动画 -- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 200ms ease both;
+}
+.animate-zoom-in {
+  animation: zoom-in 240ms ease both;
+}
+
+/* -- 打印样式（简历页 Ctrl+P / 存 PDF）-- */
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  a {
+    text-decoration: none !important;
+  }
+  article,
+  section,
+  div {
+    break-inside: avoid-page;
+  }
+  /* 简历深色头部打印时转白底黑字，省墨 */
+  .resume-header-print {
+    background: #fff !important;
+    color: #1a1510 !important;
+  }
+  .resume-header-print * {
+    color: #1a1510 !important;
+    border-color: #d4cfc5 !important;
+  }
 }
 
 /* Custom scrollbar */

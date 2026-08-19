@@ -46,7 +46,28 @@ export function formatDate(date: Date | string, format: string = "YYYY-MM-DD"): 
 }
 
 export function estimateReadTime(content: string): number {
+  // content 是 TipTap JSON 字符串，解析后提取纯文本再计数
+  let textLength = 0
+  try {
+    const parsed = JSON.parse(content)
+    textLength = countTextLength(parsed)
+  } catch {
+    // 非 JSON 内容（兼容旧数据）按原始长度估算
+    textLength = content.replace(/<[^>]*>/g, "").length
+  }
   // Rough estimate: 300 Chinese characters per minute
-  const textLength = content.replace(/<[^>]*>/g, "").length
   return Math.max(1, Math.ceil(textLength / 300))
+}
+
+/** 递归统计 TipTap 文档节点中的纯文本长度 */
+function countTextLength(node: any): number {
+  if (!node || typeof node !== "object") return 0
+  if (typeof node.text === "string") return node.text.length
+  if (Array.isArray(node.content)) {
+    return node.content.reduce(
+      (sum: number, child: any) => sum + countTextLength(child),
+      0
+    )
+  }
+  return 0
 }

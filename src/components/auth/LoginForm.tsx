@@ -2,14 +2,23 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Loader2, LogIn } from "lucide-react"
 import { loginAction } from "@/lib/auth-actions"
 
 export default function LoginForm() {
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  // 校验 callbackUrl，防止开放重定向（仅允许站内相对路径）
+  const rawCallback = searchParams.get("callbackUrl") || "/"
+  const callbackUrl =
+    rawCallback.startsWith("/") && !rawCallback.startsWith("//")
+      ? rawCallback
+      : "/"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,7 +26,7 @@ export default function LoginForm() {
     setLoading(true)
 
     try {
-      const result = await loginAction(email, password)
+      const result = await loginAction(email.trim(), password)
 
       if (!result.success) {
         setError(result.error || "邮箱或密码错误")
@@ -26,7 +35,7 @@ export default function LoginForm() {
       }
 
       // 硬导航确保 session cookie 被所有组件正确加载
-      window.location.href = "/"
+      window.location.href = callbackUrl
     } catch {
       setError("登录失败，请稍后重试")
       setLoading(false)
@@ -42,7 +51,10 @@ export default function LoginForm() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+          <div
+            role="alert"
+            className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm"
+          >
             {error}
           </div>
         )}
@@ -56,7 +68,9 @@ export default function LoginForm() {
           </label>
           <input
             id="email"
+            name="email"
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -74,7 +88,9 @@ export default function LoginForm() {
           </label>
           <input
             id="password"
+            name="password"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
