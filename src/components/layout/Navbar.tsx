@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 import { Menu, X, LogOut, User, PenLine } from "lucide-react"
 
 export default function Navbar() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
   const user = session?.user as any
 
   const navLinks = [
@@ -16,6 +18,9 @@ export default function Navbar() {
     { href: "/blog/collections", label: "合集" },
     { href: "/resume", label: "简历" },
   ]
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href)
 
   return (
     <header className="sticky top-0 z-50 bg-paper/90 backdrop-blur-md border-b border-gray-200">
@@ -35,13 +40,20 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                aria-current={isActive(link.href) ? "page" : undefined}
+                className={`text-sm transition-colors ${
+                  isActive(link.href)
+                    ? "text-gray-900 font-medium"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
               >
                 {link.label}
               </Link>
             ))}
 
-            {user ? (
+            {status === "loading" ? (
+              <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-sm" />
+            ) : user ? (
               <div className="flex items-center gap-3">
                 {user.role === "OWNER" && (
                   <Link
@@ -76,60 +88,70 @@ export default function Navbar() {
             className="md:hidden p-2 text-gray-600 hover:text-gray-900"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="菜单"
+            aria-expanded={menuOpen}
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile nav */}
-      {menuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white">
-          <div className="px-4 py-3 space-y-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <hr className="border-gray-100" />
-            {user ? (
-              <>
-                {user.role === "OWNER" && (
-                  <Link
-                    href="/admin"
-                    className="block text-sm text-gray-600 hover:text-gray-900"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    管理后台
-                  </Link>
-                )}
-                <button
-                  onClick={() => {
-                    signOut({ callbackUrl: window.location.origin + "/" })
-                    setMenuOpen(false)
-                  }}
-                  className="block text-sm text-red-500"
+      {/* Mobile nav（展开/收起动画） */}
+      <div
+        className={`md:hidden border-t border-gray-100 bg-white overflow-hidden transition-all duration-300 ease-in-out ${
+          menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="px-4 py-3 space-y-3">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={isActive(link.href) ? "page" : undefined}
+              className={`block text-sm transition-colors ${
+                isActive(link.href)
+                  ? "text-gray-900 font-medium"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+              onClick={() => setMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <hr className="border-gray-100" />
+          {status === "loading" ? (
+            <div className="w-full h-8 bg-gray-100 animate-pulse rounded-sm" />
+          ) : user ? (
+            <>
+              {user.role === "OWNER" && (
+                <Link
+                  href="/admin"
+                  className="block text-sm text-gray-600 hover:text-gray-900"
+                  onClick={() => setMenuOpen(false)}
                 >
-                  退出登录
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/auth/login"
-                className="block text-sm text-accent font-medium"
-                onClick={() => setMenuOpen(false)}
+                  管理后台
+                </Link>
+              )}
+              <button
+                onClick={() => {
+                  signOut({ callbackUrl: window.location.origin + "/" })
+                  setMenuOpen(false)
+                }}
+                className="block text-sm text-red-500"
               >
-                登录
-              </Link>
-            )}
-          </div>
+                退出登录
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="block text-sm text-accent font-medium"
+              onClick={() => setMenuOpen(false)}
+            >
+              登录
+            </Link>
+          )}
         </div>
-      )}
+      </div>
     </header>
   )
 }

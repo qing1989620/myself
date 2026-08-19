@@ -37,7 +37,7 @@ export default async function AdminCollectionsPage() {
           <p className="text-sm mt-1">创建合集来组织你的文章</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">

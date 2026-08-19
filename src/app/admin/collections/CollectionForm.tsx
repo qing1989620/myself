@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Save } from "lucide-react"
+import { useToast } from "@/components/ui/Toast"
 
 interface CollectionFormProps {
   initialData?: {
@@ -17,6 +18,7 @@ interface CollectionFormProps {
 
 export default function CollectionForm({ initialData }: CollectionFormProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [name, setName] = useState(initialData?.name || "")
   const [description, setDescription] = useState(
     initialData?.description || ""
@@ -60,6 +62,7 @@ export default function CollectionForm({ initialData }: CollectionFormProps) {
         return
       }
 
+      toast(isEditing ? "合集已更新" : "合集已创建", "success")
       router.push("/admin/collections")
       router.refresh()
     } catch {

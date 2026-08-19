@@ -9,7 +9,7 @@ export default function ResumeHeader({
   resumePdf?: string | null
 }) {
   return (
-    <section className="py-16 px-4 bg-gradient-to-r from-brand-navy to-gray-800 text-white">
+    <section className="resume-header-print py-16 px-4 bg-gradient-to-r from-brand-navy to-gray-800 text-white">
       <div className="max-w-5xl mx-auto text-center space-y-4">
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
           {profile?.name || "未设置姓名"}
@@ -23,7 +23,7 @@ export default function ResumeHeader({
           <span>📍 {profile?.location || "未设置所在地"}</span>
         </div>
         {resumePdf && (
-          <div className="pt-4">
+          <div className="pt-4 no-print">
             <DownloadResumeButton />
           </div>
         )}

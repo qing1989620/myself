@@ -1,4 +1,5 @@
 import type { ResumeProfileData, ResumeSkillData, ResumeExperienceData } from "@/lib/resume-helpers"
+import SkillBar from "./SkillBar"
 
 interface LeftColumnProps {
   profile: ResumeProfileData | null
@@ -43,18 +44,11 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
           {skills.length > 0 ? (
             skills.map((skill) => (
-              <div key={skill.id ?? skill.name} className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-700">{skill.name}</span>
-                  <span className="text-gray-400 text-xs">{skill.level}%</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-accent to-brand-cyan rounded-full transition-all"
-                    style={{ width: `${skill.level}%` }}
-                  />
-                </div>
-              </div>
+              <SkillBar
+                key={skill.id ?? skill.name}
+                name={skill.name}
+                level={skill.level}
+              />
             ))
           ) : (
             <p className="text-sm text-gray-400">暂无技能信息</p>

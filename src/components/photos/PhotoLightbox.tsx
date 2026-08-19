@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useCallback } from "react"
-import { X, ChevronLeft, ChevronRight } from "lucide-react"
+import { useEffect, useCallback, useState } from "react"
+import { X, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 
 interface PhotoItem {
   id: number
@@ -26,6 +26,24 @@ export default function PhotoLightbox({
   const photo = photos[currentIndex]
   const hasPrev = currentIndex > 0
   const hasNext = currentIndex < photos.length - 1
+  const [imgLoaded, setImgLoaded] = useState(false)
+
+  // 切换图片时重置加载态
+  useEffect(() => {
+    setImgLoaded(false)
+  }, [currentIndex])
+
+  // 预加载相邻图片，切换零等待
+  useEffect(() => {
+    const preload = (idx: number) => {
+      if (idx >= 0 && idx < photos.length) {
+        const img = new Image()
+        img.src = photos[idx].url
+      }
+    }
+    preload(currentIndex + 1)
+    preload(currentIndex - 1)
+  }, [currentIndex, photos])
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -59,7 +77,7 @@ export default function PhotoLightbox({
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+      className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center animate-fade-in"
       onClick={onClose}
     >
       {/* Close button */}
@@ -87,14 +105,23 @@ export default function PhotoLightbox({
 
       {/* Image */}
       <div
-        className="flex flex-col items-center max-w-[90vw] max-h-[85vh]"
+        key={currentIndex}
+        className="flex flex-col items-center max-w-[90vw] max-h-[85vh] animate-zoom-in"
         onClick={(e) => e.stopPropagation()}
       >
+        {!imgLoaded && (
+          <div className="min-h-[40vh] flex items-center justify-center">
+            <Loader2 size={32} className="text-white/50 animate-spin" />
+          </div>
+        )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.url}
           alt={photo.title || "照片"}
-          className="max-w-full max-h-[75vh] object-contain rounded-lg"
+          onLoad={() => setImgLoaded(true)}
+          className={`max-w-full max-h-[75vh] object-contain rounded-lg ${
+            imgLoaded ? "" : "hidden"
+          }`}
         />
         {(photo.title || photo.description) && (
           <div className="mt-4 text-center text-white">

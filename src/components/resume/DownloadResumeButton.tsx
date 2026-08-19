@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import { Download } from "lucide-react"
+import { useToast } from "@/components/ui/Toast"
 
 export default function DownloadResumeButton() {
   const [downloading, setDownloading] = useState(false)
+  const { toast } = useToast()
 
   const handleDownload = async () => {
     setDownloading(true)
@@ -12,7 +14,7 @@ export default function DownloadResumeButton() {
       const res = await fetch("/api/resume/download")
       if (!res.ok) {
         const data = await res.json().catch(() => ({ error: "下载失败" }))
-        alert(data.error || "下载失败")
+        toast(data.error || "下载失败", "error")
         setDownloading(false)
         return
       }
@@ -21,13 +23,14 @@ export default function DownloadResumeButton() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
+      // 与服务器 Content-Disposition 保持一致的文件名
       a.download = "resume.pdf"
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     } catch {
-      alert("下载失败，请稍后重试")
+      toast("下载失败，请稍后重试", "error")
     } finally {
       setDownloading(false)
     }

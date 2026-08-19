@@ -29,8 +29,9 @@ export default function AdminSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-56 bg-gray-900 text-white min-h-[calc(100vh-4rem)] p-4 flex flex-col">
-      <div className="space-y-1 flex-1">
+    <aside className="w-full md:w-56 bg-gray-900 text-white md:min-h-[calc(100vh-4rem)] p-4 flex flex-col">
+      {/* 移动端：横向滚动菜单；桌面端：纵向固定侧栏 */}
+      <nav className="flex md:flex-col gap-1 flex-1 overflow-x-auto md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0">
         {links.map((link) => {
           const isActive =
             pathname === link.href ||
@@ -39,7 +40,7 @@ export default function AdminSidebar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors whitespace-nowrap ${
                 isActive
                   ? "bg-white/15 text-white"
                   : "text-gray-400 hover:text-white hover:bg-white/5"
@@ -50,9 +51,9 @@ export default function AdminSidebar() {
             </Link>
           )
         })}
-      </div>
+      </nav>
 
-      <div className="space-y-1 pt-4 border-t border-white/10">
+      <div className="hidden md:block space-y-1 pt-4 border-t border-white/10">
         <Link
           href="/"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
@@ -65,6 +66,17 @@ export default function AdminSidebar() {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors"
         >
           <LogOut size={18} />
+          退出登录
+        </button>
+      </div>
+
+      {/* 移动端退出（桌面端在左侧栏） */}
+      <div className="md:hidden pt-2 border-t border-white/10">
+        <button
+          onClick={() => signOut({ callbackUrl: window.location.origin + "/" })}
+          className="w-full flex items-center justify-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-white/5 transition-colors"
+        >
+          <LogOut size={16} />
           退出登录
         </button>
       </div>

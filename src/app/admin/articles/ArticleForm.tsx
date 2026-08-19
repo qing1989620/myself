@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Loader2, Save, Eye, EyeOff, Pin, PinOff } from "lucide-react"
+import { useToast } from "@/components/ui/Toast"
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
@@ -33,6 +34,7 @@ interface ArticleFormProps {
 
 export default function ArticleForm({ initialData, collections }: ArticleFormProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [title, setTitle] = useState(initialData?.title || "")
   const [summary, setSummary] = useState(initialData?.summary || "")
   const [content, setContent] = useState(initialData?.content || "")
@@ -58,7 +60,8 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
       setError("请输入文章标题")
       return
     }
-    if (!content) {
+    // 空文校验：全删内容后 TipTap 序列化为 {"type":"doc","content":[]}，truthy 但无实际内容
+    if (!hasArticleContent(content)) {
       setError("请输入文章内容")
       return
     }
@@ -84,6 +87,7 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
         return
       }
 
+      toast(isEditing ? "文章已更新" : "文章已保存", "success")
       router.push("/admin/articles")
       router.refresh()
     } catch {
@@ -92,8 +96,7 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
     }
   }
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+  return (    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
       {error && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
           {error}
@@ -194,4 +197,17 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
       </div>
     </form>
   )
+}
+
+/** 判断 TipTap JSON 内容是否包含实际文本/图片（防止保存空文档） */
+function hasArticleContent(content: string): boolean {
+  if (!content) return false
+  try {
+    const parsed = JSON.parse(content)
+    if (!parsed || typeof parsed !== "object") return false
+    const nodes = parsed.content
+    return Array.isArray(nodes) && nodes.length > 0
+  } catch {
+    return content.trim().length > 0
+  }
 }

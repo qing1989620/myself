@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { ViewTransition } from "react"
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
@@ -75,53 +76,55 @@ export default async function CollectionDetailPage({ params, searchParams }: Pro
   const totalPages = Math.ceil(total / limit)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
-      <Link
-        href="/blog/collections"
-        className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-accent transition-colors mb-8"
-      >
-        <ChevronLeft size={16} />
-        返回合集列表
-      </Link>
+    <ViewTransition enter="auto" exit="auto" default="none">
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <Link
+          href="/blog/collections"
+          className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-accent transition-colors mb-8"
+        >
+          <ChevronLeft size={16} />
+          返回合集列表
+        </Link>
 
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-900">{collection.name}</h1>
-        {collection.description && (
-          <p className="text-gray-500 mt-2">{collection.description}</p>
-        )}
-        <p className="text-sm text-gray-400 mt-1">共 {total} 篇文章</p>
-      </div>
-
-      {articles.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-lg">该合集中暂无文章</p>
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-gray-900">{collection.name}</h1>
+          {collection.description && (
+            <p className="text-gray-500 mt-2">{collection.description}</p>
+          )}
+          <p className="text-sm text-gray-400 mt-1">共 {total} 篇文章</p>
         </div>
-      ) : (
-        <>
-          <div className="space-y-6">
-            {articles.map((article) => (
-              <ArticleCard
-                key={article.id}
-                title={article.title}
-                slug={article.slug}
-                summary={article.summary}
-                coverImage={article.coverImage}
-                viewCount={article.viewCount}
-                createdAt={formatDate(article.createdAt)}
-                pinned={article.pinned}
-                author={article.author}
+
+        {articles.length === 0 ? (
+          <div className="text-center py-16 text-gray-400">
+            <p className="text-lg">该合集中暂无文章</p>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-6">
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.id}
+                  title={article.title}
+                  slug={article.slug}
+                  summary={article.summary}
+                  coverImage={article.coverImage}
+                  viewCount={article.viewCount}
+                  createdAt={formatDate(article.createdAt)}
+                  pinned={article.pinned}
+                  author={article.author}
+                />
+              ))}
+            </div>
+            <div className="mt-10">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                baseUrl={`/blog/collections/${slug}`}
               />
-            ))}
-          </div>
-          <div className="mt-10">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              baseUrl={`/blog/collections/${slug}`}
-            />
-          </div>
-        </>
-      )}
-    </div>
+            </div>
+          </>
+        )}
+      </div>
+    </ViewTransition>
   )
 }

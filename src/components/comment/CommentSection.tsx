@@ -1,5 +1,10 @@
 "use client"
 
+import { useState, useCallback } from "react"
+import { useSession } from "next-auth/react"
+import Link from "next/link"
+import { Send, Loader2 } from "lucide-react"
+
 export default function CommentSection({
   articleId,
   initialComments,
@@ -7,21 +12,43 @@ export default function CommentSection({
   articleId: number
   initialComments: any[]
 }) {
+  const [comments, setComments] = useState<any[]>(initialComments)
+
+  // 新评论本地插入评论树（不刷新页面）
+  const handleCommentCreated = useCallback((comment: any) => {
+    setComments((prev) => {
+      const next = prev.map((c) => ({ ...c, replies: [...(c.replies || [])] }))
+      if (!comment.parentId) {
+        return [...next, comment]
+      }
+      const insertInto = (list: any[]): boolean => {
+        for (const item of list) {
+          if (item.id === comment.parentId) {
+            item.replies = [...(item.replies || []), comment]
+            return true
+          }
+          if (item.replies?.length && insertInto(item.replies)) return true
+        }
+        return false
+      }
+      return insertInto(next) ? next : [...next, comment]
+    })
+  }, [])
+
   return (
     <section className="space-y-8">
       <h2 className="text-xl font-bold text-gray-900">
-        评论 ({initialComments.length})
+        评论 ({comments.length})
       </h2>
-      <CommentForm articleId={articleId} />
-      <CommentList comments={initialComments} articleId={articleId} />
+      <CommentForm articleId={articleId} onSuccess={handleCommentCreated} />
+      <CommentList
+        comments={comments}
+        articleId={articleId}
+        onCommentCreated={handleCommentCreated}
+      />
     </section>
   )
 }
-
-import { useState } from "react"
-import { useSession } from "next-auth/react"
-import Link from "next/link"
-import { Send, Loader2 } from "lucide-react"
 
 function CommentForm({
   articleId,
@@ -30,7 +57,7 @@ function CommentForm({
 }: {
   articleId: number
   parentId?: number
-  onSuccess?: () => void
+  onSuccess?: (comment: any) => void
 }) {
   const { data: session } = useSession()
   const [content, setContent] = useState("")
@@ -69,17 +96,18 @@ function CommentForm({
         }),
       })
 
+      const data = await res.json().catch(() => null)
+
       if (!res.ok) {
-        const data = await res.json()
-        setError(data.error || "评论失败")
+        setError(data?.error || "评论失败")
         setLoading(false)
         return
       }
 
       setContent("")
-      onSuccess?.()
-      // Refresh the page to show new comment
-      window.location.reload()
+      setLoading(false)
+      // 本地插入新评论，无需整页刷新
+      onSuccess?.(data)
     } catch {
       setError("网络错误")
       setLoading(false)
@@ -88,9 +116,7 @@ function CommentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      {error && (
-        <p className="text-sm text-red-500">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-500">{error}</p>}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -119,9 +145,11 @@ function CommentForm({
 function CommentList({
   comments,
   articleId,
+  onCommentCreated,
 }: {
   comments: any[]
   articleId: number
+  onCommentCreated: (comment: any) => void
 }) {
   if (comments.length === 0) {
     return (
@@ -138,6 +166,7 @@ function CommentList({
           key={comment.id}
           comment={comment}
           articleId={articleId}
+          onCommentCreated={onCommentCreated}
         />
       ))}
     </div>
@@ -147,9 +176,11 @@ function CommentList({
 function CommentItem({
   comment,
   articleId,
+  onCommentCreated,
 }: {
   comment: any
   articleId: number
+  onCommentCreated: (comment: any) => void
 }) {
   const [showReply, setShowReply] = useState(false)
   const { data: session } = useSession()
@@ -193,7 +224,10 @@ function CommentItem({
               <CommentForm
                 articleId={articleId}
                 parentId={comment.id}
-                onSuccess={() => setShowReply(false)}
+                onSuccess={(c) => {
+                  setShowReply(false)
+                  onCommentCreated(c)
+                }}
               />
             </div>
           )}
@@ -208,6 +242,7 @@ function CommentItem({
               key={reply.id}
               comment={reply}
               articleId={articleId}
+              onCommentCreated={onCommentCreated}
             />
           ))}
         </div>

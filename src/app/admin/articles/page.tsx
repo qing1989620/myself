@@ -35,7 +35,7 @@ export default async function AdminArticlesPage() {
           暂无文章，点击上方按钮创建第一篇
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500">
               <tr>

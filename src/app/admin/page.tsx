@@ -83,7 +83,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Recent articles */}
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">最近文章</h2>
         </div>
