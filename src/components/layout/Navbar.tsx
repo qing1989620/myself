@@ -41,13 +41,20 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={isActive(link.href) ? "page" : undefined}
-                className={`text-sm transition-colors ${
+                className={`relative text-[15px] transition-all duration-200 ${
                   isActive(link.href)
-                    ? "text-gray-900 font-medium"
+                    ? "text-gray-900 font-bold"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {link.label}
+                {/* 水墨风下划线：active 时从左到右淡出，如毛笔一划 */}
+                <span
+                  aria-hidden
+                  className={`absolute -bottom-1.5 left-0 h-[2px] rounded-full bg-gradient-to-r from-accent via-accent to-transparent transition-all duration-300 ${
+                    isActive(link.href) ? "w-full opacity-100" : "w-0 opacity-0"
+                  }`}
+                />
               </Link>
             ))}
 
@@ -107,10 +114,10 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               aria-current={isActive(link.href) ? "page" : undefined}
-              className={`block text-sm transition-colors ${
+              className={`block text-sm border-l-2 pl-3 transition-colors ${
                 isActive(link.href)
-                  ? "text-gray-900 font-medium"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "text-gray-900 font-bold border-accent"
+                  : "text-gray-600 hover:text-gray-900 border-transparent"
               }`}
               onClick={() => setMenuOpen(false)}
             >

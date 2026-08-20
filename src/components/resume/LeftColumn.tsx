@@ -1,5 +1,6 @@
 import type { ResumeProfileData, ResumeSkillData, ResumeExperienceData } from "@/lib/resume-helpers"
 import SkillBar from "./SkillBar"
+import AutoLink from "@/components/ui/AutoLink"
 
 interface LeftColumnProps {
   profile: ResumeProfileData | null
@@ -78,7 +79,11 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
           自我评价
         </h3>
         <div className="bg-white rounded-xl border border-gray-100 p-5 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-          {profile?.selfEvaluation || "暂无自我评价"}
+          {profile?.selfEvaluation ? (
+            <AutoLink text={profile.selfEvaluation} />
+          ) : (
+            "暂无自我评价"
+          )}
         </div>
       </section>
 
@@ -89,7 +94,11 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
             兴趣爱好
           </h3>
           <div className="bg-white rounded-xl border border-gray-100 p-5 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-            {profile.hobbies}
+            {profile.hobbies ? (
+              <AutoLink text={profile.hobbies} />
+            ) : (
+              "暂无兴趣爱好"
+            )}
           </div>
         </section>
       ) : null}

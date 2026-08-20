@@ -1,4 +1,5 @@
 import type { ResumeExperienceData } from "@/lib/resume-helpers"
+import AutoLink from "@/components/ui/AutoLink"
 
 export default function RightColumn({
   experiences,
@@ -29,7 +30,7 @@ export default function RightColumn({
                   )}
                   {edu.description && (
                     <p className="text-sm text-gray-600 mt-2 leading-relaxed whitespace-pre-line">
-                      {edu.description}
+                      <AutoLink text={edu.description} />
                     </p>
                   )}
                 </div>
@@ -99,7 +100,7 @@ export default function RightColumn({
                   )}
                   {item.description && (
                     <p className="text-sm text-gray-600 mt-2 leading-relaxed whitespace-pre-line">
-                      {item.description}
+                      <AutoLink text={item.description} />
                     </p>
                   )}
                 </div>
@@ -157,10 +158,14 @@ function TimelineItem({
         )}
       </div>
       {description && (
-        <p className="text-sm text-gray-600 mt-1.5 leading-relaxed whitespace-pre-line">{description}</p>
+        <p className="text-sm text-gray-600 mt-1.5 leading-relaxed whitespace-pre-line">
+          <AutoLink text={description} />
+        </p>
       )}
       {tech && (
-        <p className="text-xs text-gray-400 mt-1.5 font-mono">{tech}</p>
+        <p className="text-xs text-gray-400 mt-1.5 font-mono">
+          <AutoLink text={tech} />
+        </p>
       )}
     </div>
   )
