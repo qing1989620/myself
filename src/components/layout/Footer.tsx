@@ -47,7 +47,7 @@ export default function Footer() {
           {/* Social */}
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com"
+              href="https://github.com/LanKnight"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-gray-600 transition-colors"
