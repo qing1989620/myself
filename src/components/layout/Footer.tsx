@@ -56,7 +56,7 @@ export default function Footer() {
               <GithubIcon size={20} />
             </a>
             <a
-              href="mailto:admin@lankhub.com"
+              href="mailto:lanknight@qq.com"
               className="text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Email"
             >
