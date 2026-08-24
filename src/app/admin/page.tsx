@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 import { FileText, MessageSquare, Eye, PenLine } from "lucide-react"
 
@@ -102,8 +103,13 @@ export default async function AdminDashboard() {
             <tbody className="divide-y divide-gray-100">
               {recentArticles.map((article) => (
                 <tr key={article.id} className="hover:bg-gray-50/50">
-                  <td className="px-5 py-3 text-gray-800">
-                    {article.title}
+                  <td className="px-5 py-3">
+                    <Link
+                      href={`/admin/articles/${article.id}/edit`}
+                      className="text-gray-800 hover:text-accent transition-colors line-clamp-1"
+                    >
+                      {article.title}
+                    </Link>
                   </td>
                   <td className="px-5 py-3">
                     <span

@@ -17,13 +17,18 @@ export default function Error({
         <p className="text-gray-500 max-w-md">
           页面加载出现了一些问题，请稍后重试
         </p>
-        <button
-          onClick={reset}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-        >
-          <RefreshCw size={16} />
-          重新加载
-        </button>
+        {error.digest && (
+          <p className="text-xs text-gray-400">错误编号：{error.digest}</p>
+        )}
+        <div className="flex items-center justify-center gap-3 pt-1">
+          <button
+            onClick={reset}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+          >
+            <RefreshCw size={16} />
+            重新加载
+          </button>
+        </div>
       </div>
     </div>
   )

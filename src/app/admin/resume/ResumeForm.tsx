@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Save, Plus, Trash2, ChevronDown, ChevronUp, Upload } from "lucide-react"
+import { uploadWithProgress } from "@/lib/upload"
 
 interface SkillItem {
   name: string
@@ -156,9 +157,18 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [pdfFile, setPdfFile] = useState<string | null>(
     initialData?.profile?.resumePdf || null
   )
+  // 成功提示的定时器（组件卸载时清理）
+  const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (successTimer.current) clearTimeout(successTimer.current)
+    }
+  }, [])
 
   const toggleSection = (section: SectionKey) => {
     setExpanded((prev) => ({ ...prev, [section]: !prev[section] }))
@@ -210,7 +220,8 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
       setSuccess(true)
       setLoading(false)
       router.refresh()
-      setTimeout(() => setSuccess(false), 3000)
+      if (successTimer.current) clearTimeout(successTimer.current)
+      successTimer.current = setTimeout(() => setSuccess(false), 3000)
     } catch {
       setError("网络错误")
       setLoading(false)
@@ -227,14 +238,16 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     }
 
     setUploading(true)
+    setUploadProgress(0)
     const formData = new FormData()
     formData.append("file", file)
 
     try {
-      const res = await fetch("/api/admin/resume/upload", {
-        method: "POST",
-        body: formData,
-      })
+      const res = await uploadWithProgress(
+        "/api/admin/resume/upload",
+        formData,
+        setUploadProgress
+      )
 
       if (!res.ok) {
         const data = await res.json()
@@ -590,10 +603,10 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
             </button>
           </div>
         ) : (
-          <div>
+          <div className="space-y-2">
             <label className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-accent transition-colors text-sm text-gray-500">
               <Upload size={16} />
-              {uploading ? "上传中..." : "选择 PDF 文件上传"}
+              {uploading ? `上传中 ${uploadProgress}%` : "选择 PDF 文件上传"}
               <input
                 type="file"
                 accept=".pdf,application/pdf"
@@ -602,6 +615,14 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
                 disabled={uploading}
               />
             </label>
+            {uploading && (
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-accent rounded-full transition-[width] duration-200 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

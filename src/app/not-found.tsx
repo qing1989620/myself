@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Home } from "lucide-react"
+import GoBackButton from "@/components/ui/GoBackButton"
 
 export default function NotFound() {
   return (
@@ -8,13 +9,16 @@ export default function NotFound() {
         <p className="text-8xl font-bold text-gray-200">404</p>
         <h1 className="text-2xl font-bold text-gray-900">页面不存在</h1>
         <p className="text-gray-500">你访问的页面可能已被移除或地址错误</p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-        >
-          <Home size={16} />
-          返回首页
-        </Link>
+        <div className="flex items-center justify-center gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+          >
+            <Home size={16} />
+            返回首页
+          </Link>
+          <GoBackButton />
+        </div>
       </div>
     </div>
   )

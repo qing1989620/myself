@@ -33,11 +33,13 @@ export default function EditorToolbar({
   const ToolButton = ({
     onClick,
     active = false,
+    disabled = false,
     children,
     title,
   }: {
     onClick: () => void
     active?: boolean
+    disabled?: boolean
     children: React.ReactNode
     title: string
   }) => (
@@ -45,8 +47,15 @@ export default function EditorToolbar({
       type="button"
       onClick={onClick}
       title={title}
-      className={`p-1.5 rounded hover:bg-gray-100 transition-colors ${
-        active ? "text-accent bg-accent/10" : "text-gray-600"
+      aria-label={title}
+      aria-pressed={active}
+      disabled={disabled}
+      className={`p-1.5 rounded transition-colors ${
+        disabled
+          ? "text-gray-300 cursor-not-allowed"
+          : active
+            ? "text-accent bg-accent/10"
+            : "text-gray-600 hover:bg-gray-100"
       }`}
     >
       {children}
@@ -180,12 +189,14 @@ export default function EditorToolbar({
       <div className="flex items-center gap-0.5">
         <ToolButton
           title="撤销"
+          disabled={!editor.can().undo()}
           onClick={() => editor.chain().focus().undo().run()}
         >
           <Undo size={16} />
         </ToolButton>
         <ToolButton
           title="重做"
+          disabled={!editor.can().redo()}
           onClick={() => editor.chain().focus().redo().run()}
         >
           <Redo size={16} />

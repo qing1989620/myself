@@ -3,19 +3,36 @@ import Link from "next/link"
 import { prisma } from "@/lib/prisma"
 import { formatDate } from "@/lib/utils"
 import CommentDeleteButton from "./CommentDeleteButton"
+import Pagination from "@/components/blog/Pagination"
 
 export const metadata: Metadata = {
   title: "评论管理 - 管理后台",
 }
 
-export default async function AdminCommentsPage() {
-  const comments = await prisma.comment.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      author: { select: { id: true, name: true, email: true } },
-      article: { select: { id: true, title: true, slug: true } },
-    },
-  })
+const PAGE_SIZE = 15
+
+export default async function AdminCommentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams
+  const page = Math.max(1, parseInt(params.page || "1"))
+  const skip = (page - 1) * PAGE_SIZE
+
+  const [comments, total] = await Promise.all([
+    prisma.comment.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: PAGE_SIZE,
+      include: {
+        author: { select: { id: true, name: true, email: true } },
+        article: { select: { id: true, title: true, slug: true } },
+      },
+    }),
+    prisma.comment.count(),
+  ])
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
     <div className="space-y-6">
@@ -23,11 +40,12 @@ export default async function AdminCommentsPage() {
 
       {comments.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-          暂无评论
+          {total === 0 ? "暂无评论" : "当前页没有评论"}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
-          <table className="w-full text-sm">
+        <>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+            <table className="w-full text-sm">
             <thead className="bg-gray-50 text-gray-500">
               <tr>
                 <th className="text-left px-5 py-3 font-medium">评论内容</th>
@@ -68,6 +86,12 @@ export default async function AdminCommentsPage() {
             </tbody>
           </table>
         </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            baseUrl="/admin/comments"
+          />
+        </>
       )}
     </div>
   )

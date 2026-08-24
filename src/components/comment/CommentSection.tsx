@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { Send, Loader2 } from "lucide-react"
+import { timeAgo } from "@/lib/utils"
 
 export default function CommentSection({
   articleId,
@@ -188,12 +189,22 @@ function CommentItem({
   return (
     <div className="space-y-3">
       <div className="flex gap-3">
-        {/* Avatar */}
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/30 to-brand-cyan/30 flex items-center justify-center flex-shrink-0">
-          <span className="text-xs font-bold text-gray-600">
-            {comment.author?.name?.charAt(0) || "匿"}
-          </span>
-        </div>
+        {/* Avatar（有头像显示图片，否则首字母） */}
+        {comment.author?.avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={comment.author.avatar}
+            alt={comment.author?.name || "用户头像"}
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/30 to-brand-cyan/30 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-gray-600">
+              {comment.author?.name?.charAt(0) || "匿"}
+            </span>
+          </div>
+        )}
 
         <div className="flex-1 space-y-1.5">
           <div className="flex items-center gap-2">
@@ -201,7 +212,7 @@ function CommentItem({
               {comment.author?.name || "匿名"}
             </span>
             <span className="text-xs text-gray-400">
-              {new Date(comment.createdAt).toLocaleDateString("zh-CN")}
+              {timeAgo(comment.createdAt)}
             </span>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">

@@ -1,13 +1,15 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { Loader2, UserPlus } from "lucide-react"
 
 export default function RegisterForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { status } = useSession()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -23,6 +25,13 @@ export default function RegisterForm() {
     rawCallback.startsWith("/") && !rawCallback.startsWith("//")
       ? rawCallback
       : "/"
+
+  // 已登录用户访问注册页：直接跳回首页
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/")
+    }
+  }, [status, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

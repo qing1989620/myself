@@ -45,6 +45,24 @@ export function formatDate(date: Date | string, format: string = "YYYY-MM-DD"): 
   return `${year}-${month}-${day}`
 }
 
+/** 相对时间："刚刚 / x 分钟前 / x 小时前 / x 天前 / 具体日期" */
+export function timeAgo(date: Date | string): string {
+  const d = new Date(date)
+  const diffMs = Date.now() - d.getTime()
+  const minutes = Math.floor(diffMs / 60000)
+
+  if (minutes < 1) return "刚刚"
+  if (minutes < 60) return `${minutes} 分钟前`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours} 小时前`
+
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days} 天前`
+
+  return formatDate(d)
+}
+
 export function estimateReadTime(content: string): number {
   // content 是 TipTap JSON 字符串，解析后提取纯文本再计数
   let textLength = 0

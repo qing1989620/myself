@@ -1,12 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { Upload, X, Check, Trash2, Edit3 } from "lucide-react"
-import {
-  PHOTO_CATEGORIES,
-} from "@/lib/photo-categories"
+import { Upload, X, Check, Trash2, Edit3, Loader2 } from "lucide-react"
+import { PHOTO_CATEGORIES } from "@/lib/photo-categories"
+import { uploadWithProgress } from "@/lib/upload"
 
 interface Photo {
   id: number
@@ -31,6 +30,7 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
   const [filter, setFilter] = useState<string>("all")
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
   // Upload form state
@@ -51,14 +51,29 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
   const [editTitle, setEditTitle] = useState("")
   const [editDescription, setEditDescription] = useState("")
   const [editSortOrder, setEditSortOrder] = useState(0)
+  const [savingId, setSavingId] = useState<number | null>(null)
 
   // Delete confirmation
   const [deletingId, setDeletingId] = useState<number | null>(null)
+
+  // 前端分页：每页 20 张，"加载更多"
+  const [visibleCount, setVisibleCount] = useState(20)
+  const PAGE_STEP = 20
+
+  // 组件卸载时释放预览 objectURL（防内存泄漏）
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const filteredPhotos =
     filter === "all"
       ? photos
       : photos.filter((p) => p.category === filter)
+
+  const visiblePhotos = filteredPhotos.slice(0, visibleCount)
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -84,6 +99,8 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
 
     setError(null)
     setSelectedFile(file)
+    // 释放旧预览 URL，避免内存泄漏
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
     setPreviewUrl(URL.createObjectURL(file))
 
     // Read dimensions
@@ -119,17 +136,19 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
     if (!selectedFile) return
 
     setUploading(true)
+    setUploadProgress(0)
     setError(null)
 
     try {
-      // Step 1: Upload file
+      // Step 1: Upload file（XHR 带进度）
       const formData = new FormData()
       formData.append("file", selectedFile)
 
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
+      const uploadRes = await uploadWithProgress(
+        "/api/upload",
+        formData,
+        setUploadProgress
+      )
 
       if (!uploadRes.ok) {
         const data = await safeJson(uploadRes)
@@ -162,6 +181,7 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
       const newPhoto = await safeJson(photoRes)
 
       // Reset form
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
       setSelectedFile(null)
       setPreviewUrl(null)
       setUploadTitle("")
@@ -192,7 +212,9 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
   }
 
   async function handleSaveEdit(id: number) {
+    if (savingId === id) return // 防双击并发提交
     setError(null)
+    setSavingId(id)
     try {
       const res = await fetch(`/api/admin/photos/${id}`, {
         method: "PUT",
@@ -218,6 +240,8 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "更新失败")
+    } finally {
+      setSavingId(null)
     }
   }
 
@@ -272,6 +296,7 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
                 />
                 <button
                   onClick={() => {
+                    if (previewUrl) URL.revokeObjectURL(previewUrl)
                     setSelectedFile(null)
                     setPreviewUrl(null)
                     setImageDims(null)
@@ -353,8 +378,17 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
               className="self-start flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload size={16} />
-              {uploading ? "上传中..." : "上传照片"}
+              {uploading ? `上传中 ${uploadProgress}%` : "上传照片"}
             </button>
+            {/* 上传进度条 */}
+            {uploading && (
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-accent rounded-full transition-[width] duration-200 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -399,7 +433,7 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
-            {filteredPhotos.map((photo) => (
+            {visiblePhotos.map((photo) => (
               <div
                 key={photo.id}
                 className="rounded-xl border border-gray-100 overflow-hidden bg-gray-50/30"
@@ -466,10 +500,15 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
                       <div className="flex gap-1">
                         <button
                           onClick={() => handleSaveEdit(photo.id)}
-                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                          disabled={savingId === photo.id}
+                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-600 text-white rounded text-xs hover:bg-green-700 disabled:opacity-50"
                         >
-                          <Check size={12} />
-                          保存
+                          {savingId === photo.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Check size={12} />
+                          )}
+                          {savingId === photo.id ? "保存中" : "保存"}
                         </button>
                         <button
                           onClick={cancelEdit}
@@ -542,6 +581,18 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* 加载更多 */}
+        {visiblePhotos.length < filteredPhotos.length && (
+          <div className="flex justify-center pb-4">
+            <button
+              onClick={() => setVisibleCount((c) => c + PAGE_STEP)}
+              className="px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              加载更多（已显示 {visiblePhotos.length}/{filteredPhotos.length}）
+            </button>
           </div>
         )}
       </div>

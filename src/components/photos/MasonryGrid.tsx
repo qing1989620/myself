@@ -25,7 +25,7 @@ export default function MasonryGrid({
       {photos.map((photo, index) => (
         <div
           key={photo.id}
-          className="mb-4 break-inside-avoid rounded-xl overflow-hidden bg-gray-100 cursor-pointer group"
+          className="mb-4 break-inside-avoid rounded-xl overflow-hidden bg-gray-100 cursor-pointer group relative"
           onClick={() => onPhotoClick(index)}
         >
           {photo.width && photo.height ? (
@@ -45,6 +45,22 @@ export default function MasonryGrid({
               className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
+          )}
+
+          {/* Hover 浮现标题/描述 */}
+          {(photo.title || photo.description) && (
+            <div className="absolute inset-x-0 bottom-0 px-4 py-3 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {photo.title && (
+                <p className="text-sm font-medium text-white truncate">
+                  {photo.title}
+                </p>
+              )}
+              {photo.description && (
+                <p className="text-xs text-white/80 mt-0.5 line-clamp-2">
+                  {photo.description}
+                </p>
+              )}
+            </div>
           )}
         </div>
       ))}

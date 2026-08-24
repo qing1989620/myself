@@ -22,8 +22,8 @@ export default function RightColumn({
           </h3>
           <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
             {education.map((edu) => (
-              <div key={edu.id ?? edu.title} className="flex justify-between items-start">
-                <div>
+              <div key={edu.id ?? edu.title} className="flex justify-between items-start gap-3">
+                <div className="min-w-0">
                   <h4 className="font-semibold text-gray-900">{edu.title}</h4>
                   {edu.subtitle && (
                     <p className="text-sm text-gray-500 mt-0.5">{edu.subtitle}</p>
@@ -35,7 +35,7 @@ export default function RightColumn({
                   )}
                 </div>
                 {(edu.startDate || edu.endDate) && (
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                  <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 pt-0.5">
                     {edu.startDate} {edu.endDate ? `- ${edu.endDate}` : ""}
                   </span>
                 )}
@@ -92,8 +92,8 @@ export default function RightColumn({
           </h3>
           <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
             {practices.map((item) => (
-              <div key={item.id ?? item.title} className="flex justify-between items-start">
-                <div>
+              <div key={item.id ?? item.title} className="flex justify-between items-start gap-3">
+                <div className="min-w-0">
                   <h4 className="font-semibold text-gray-900">{item.title}</h4>
                   {item.subtitle && (
                     <p className="text-sm text-gray-500 mt-0.5">{item.subtitle}</p>
@@ -105,7 +105,7 @@ export default function RightColumn({
                   )}
                 </div>
                 {(item.startDate || item.endDate) && (
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                  <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 pt-0.5">
                     {formatDateRange(item.startDate, item.endDate)}
                   </span>
                 )}
@@ -151,10 +151,10 @@ function TimelineItem({
 }) {
   return (
     <div className="relative pl-4 border-l-2 border-gray-100">
-      <div className="flex justify-between items-start">
-        <h4 className="font-semibold text-gray-900">{title}</h4>
+      <div className="flex justify-between items-start gap-3">
+        <h4 className="font-semibold text-gray-900 min-w-0">{title}</h4>
         {date && (
-          <span className="text-xs text-gray-400 whitespace-nowrap">{date}</span>
+          <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 pt-0.5">{date}</span>
         )}
       </div>
       {description && (

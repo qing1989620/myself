@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { prisma } from "@/lib/prisma"
 import { requireOwner } from "@/lib/auth-helpers"
 
@@ -129,6 +130,8 @@ export async function PUT(req: NextRequest) {
       return profile
     })
 
+    // 保存成功后立即刷新简历页的 ISR 缓存
+    revalidatePath("/resume")
     return NextResponse.json({ success: true, profileId: result.id })
   } catch (error) {
     console.error("Update resume error:", error)

@@ -1,21 +1,38 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Plus, Edit, Trash2, Pin } from "lucide-react"
+import { Plus, Edit, Pin } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { formatDate } from "@/lib/utils"
 import DeleteButton from "./DeleteButton"
+import Pagination from "@/components/blog/Pagination"
 
 export const metadata: Metadata = {
   title: "文章管理 - 管理后台",
 }
 
-export default async function AdminArticlesPage() {
-  const articles = await prisma.article.findMany({
-    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
-    include: {
-      _count: { select: { comments: true } },
-    },
-  })
+const PAGE_SIZE = 10
+
+export default async function AdminArticlesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams
+  const page = Math.max(1, parseInt(params.page || "1"))
+  const skip = (page - 1) * PAGE_SIZE
+
+  const [articles, total] = await Promise.all([
+    prisma.article.findMany({
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
+      skip,
+      take: PAGE_SIZE,
+      include: {
+        _count: { select: { comments: true } },
+      },
+    }),
+    prisma.article.count(),
+  ])
+  const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
     <div className="space-y-6">
@@ -32,72 +49,81 @@ export default async function AdminArticlesPage() {
 
       {articles.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-          暂无文章，点击上方按钮创建第一篇
+          {total === 0
+            ? "暂无文章，点击上方按钮创建第一篇"
+            : "当前页没有文章"}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500">
-              <tr>
-                <th className="text-left px-5 py-3 font-medium w-[35%]">
-                  标题
-                </th>
-                <th className="text-left px-5 py-3 font-medium">状态</th>
-                <th className="text-center px-5 py-3 font-medium w-[60px]">置顶</th>
-                <th className="text-left px-5 py-3 font-medium">评论</th>
-                <th className="text-left px-5 py-3 font-medium">日期</th>
-                <th className="text-right px-5 py-3 font-medium">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {articles.map((article) => (
-                <tr key={article.id} className="hover:bg-gray-50/50">
-                  <td className="px-5 py-3">
-                    <span className="text-gray-800 line-clamp-1">
-                      {article.title}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
-                        article.published
-                          ? "bg-green-50 text-green-600"
-                          : "bg-yellow-50 text-yellow-600"
-                      }`}
-                    >
-                      {article.published ? "已发布" : "草稿"}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-center">
-                    {article.pinned ? (
-                      <Pin size={14} className="text-amber-500 inline" />
-                    ) : (
-                      <span className="text-gray-300">-</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3 text-gray-500">
-                    {article._count.comments}
-                  </td>
-                  <td className="px-5 py-3 text-gray-400">
-                    {formatDate(article.createdAt)}
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/articles/${article.id}/edit`}
-                        className="p-1.5 text-gray-400 hover:text-accent transition-colors"
-                        title="编辑"
-                      >
-                        <Edit size={16} />
-                      </Link>
-                      <DeleteButton articleId={article.id} />
-                    </div>
-                  </td>
+        <>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-500">
+                <tr>
+                  <th className="text-left px-5 py-3 font-medium w-[35%]">
+                    标题
+                  </th>
+                  <th className="text-left px-5 py-3 font-medium">状态</th>
+                  <th className="text-center px-5 py-3 font-medium w-[60px]">置顶</th>
+                  <th className="text-left px-5 py-3 font-medium">评论</th>
+                  <th className="text-left px-5 py-3 font-medium">日期</th>
+                  <th className="text-right px-5 py-3 font-medium">操作</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {articles.map((article) => (
+                  <tr key={article.id} className="hover:bg-gray-50/50">
+                    <td className="px-5 py-3">
+                      <span className="text-gray-800 line-clamp-1">
+                        {article.title}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${
+                          article.published
+                            ? "bg-green-50 text-green-600"
+                            : "bg-yellow-50 text-yellow-600"
+                        }`}
+                      >
+                        {article.published ? "已发布" : "草稿"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-center">
+                      {article.pinned ? (
+                        <Pin size={14} className="text-amber-500 inline" />
+                      ) : (
+                        <span className="text-gray-300">-</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 text-gray-500">
+                      {article._count.comments}
+                    </td>
+                    <td className="px-5 py-3 text-gray-400">
+                      {formatDate(article.createdAt)}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/admin/articles/${article.id}/edit`}
+                          className="p-1.5 text-gray-400 hover:text-accent transition-colors"
+                          title="编辑"
+                        >
+                          <Edit size={16} />
+                        </Link>
+                        <DeleteButton articleId={article.id} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            baseUrl="/admin/articles"
+          />
+        </>
       )}
     </div>
   )

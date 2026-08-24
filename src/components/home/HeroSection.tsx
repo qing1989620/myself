@@ -1,22 +1,8 @@
 "use client"
 
-import { useEffect, useRef } from "react"
 import { ChevronDown } from "lucide-react"
 
 export default function HeroSection() {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (el) {
-      el.classList.add("opacity-0")
-      requestAnimationFrame(() => {
-        el.classList.add("transition-opacity", "duration-1000")
-        el.classList.remove("opacity-0")
-      })
-    }
-  }, [])
-
   const scrollToAbout = () => {
     document
       .getElementById("about")
@@ -24,10 +10,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section
-      ref={ref}
-      className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center px-4"
-    >
+    <section className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center px-4 animate-fade-in">
       {/* Background gradient */}
       <div className="absolute inset-0 ink-wash-bg" />
 

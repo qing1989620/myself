@@ -3,6 +3,7 @@ import { ViewTransition } from "react"
 import { notFound } from "next/navigation"
 import ArticleContent from "@/components/blog/ArticleContent"
 import ArticleViewTracker from "@/components/blog/ArticleViewTracker"
+import ReadingProgress from "@/components/blog/ReadingProgress"
 import CommentSection from "@/components/comment/CommentSection"
 import { prisma } from "@/lib/prisma"
 import { formatDate, estimateReadTime } from "@/lib/utils"
@@ -91,6 +92,7 @@ export default async function BlogDetailPage({
 
   return (
     <ViewTransition enter="auto" exit="auto" default="none">
+      <ReadingProgress />
       <article className="max-w-3xl mx-auto px-4 py-16">
         {/* Header */}
         <header className="mb-10 space-y-4">
