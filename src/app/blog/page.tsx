@@ -63,7 +63,10 @@ export default async function BlogListPage({
 }) {
   const params = await searchParams
   const page = parseInt(params.page || "1")
-  const q = params.q?.trim() || undefined
+  // 搜索词限制 60 字符（防超长查询）；% 和 _ 是 SQL LIKE 通配符，
+  // 保留其字面搜索语义（Prisma 参数化查询，无注入风险）
+  const rawQ = params.q?.trim() || undefined
+  const q = rawQ ? rawQ.slice(0, 60) : undefined
   const data = await getArticles(page, q)
 
   return (
