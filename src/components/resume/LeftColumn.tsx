@@ -9,6 +9,8 @@ interface LeftColumnProps {
 }
 
 export default function LeftColumn({ profile, skills, experiences }: LeftColumnProps) {
+  const education = experiences.filter((e) => e.type === "education")
+  const campus = experiences.filter((e) => e.type === "campus")
   const certificates = experiences.filter((e) => e.type === "certificate")
 
   return (
@@ -37,6 +39,23 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
         </div>
       </section>
 
+      {/* Education */}
+      {education.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+            教育经历
+          </h3>
+          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
+            {education.map((edu) => (
+              <EducationItem
+                key={edu.id ?? edu.title}
+                edu={edu}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Skills */}
       <section className="space-y-3">
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
@@ -56,6 +75,23 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
           )}
         </div>
       </section>
+
+      {/* Campus Experience */}
+      {campus.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+            校园经历
+          </h3>
+          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
+            {campus.map((item) => (
+              <EducationItem
+                key={item.id ?? item.title}
+                edu={item}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Certificates */}
       <section className="space-y-3">
@@ -102,6 +138,35 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
           </div>
         </section>
       ) : null}
+    </div>
+  )
+}
+
+/** 左栏紧凑经历条目：标题+日期同行，描述小字（适配窄栏） */
+function EducationItem({
+  edu,
+}: {
+  edu: ResumeExperienceData
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between items-baseline gap-2">
+        <h4 className="text-sm font-semibold text-gray-900 min-w-0">{edu.title}</h4>
+        {(edu.startDate || edu.endDate) && (
+          <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">
+            {edu.startDate}
+            {edu.endDate ? `-${edu.endDate}` : ""}
+          </span>
+        )}
+      </div>
+      {edu.subtitle && (
+        <p className="text-xs text-gray-500">{edu.subtitle}</p>
+      )}
+      {edu.description && (
+        <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-line">
+          <AutoLink text={edu.description} />
+        </p>
+      )}
     </div>
   )
 }

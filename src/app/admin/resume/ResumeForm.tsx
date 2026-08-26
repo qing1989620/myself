@@ -59,7 +59,6 @@ type SectionKey =
   | "campus"
   | "projects"
   | "practices"
-  | "awards"
   | "footer"
 
 const SECTION_LABELS: Record<SectionKey, string> = {
@@ -73,7 +72,6 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   campus: "校园经历",
   projects: "项目经历",
   practices: "实践经历",
-  awards: "获奖荣誉",
   footer: "求职意向",
 }
 
@@ -133,7 +131,6 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
   const [campus, setCampus] = useState<ExperienceItem[]>(expInit("campus"))
   const [projects, setProjects] = useState<ExperienceItem[]>(expInit("project"))
   const [practices, setPractices] = useState<ExperienceItem[]>(expInit("practice"))
-  const [awards, setAwards] = useState<ExperienceItem[]>(expInit("award"))
 
   const [expanded, setExpanded] = useState<Record<SectionKey, boolean>>({
     profile: true,
@@ -146,7 +143,6 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     campus: false,
     projects: false,
     practices: false,
-    awards: false,
     footer: false,
   })
 
@@ -192,7 +188,6 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
       ...campus.map((item, i) => ({ ...item, type: "campus", sortOrder: i })),
       ...projects.map((item, i) => ({ ...item, type: "project", sortOrder: i })),
       ...practices.map((item, i) => ({ ...item, type: "practice", sortOrder: i })),
-      ...awards.map((item, i) => ({ ...item, type: "award", sortOrder: i })),
     ]
 
     try {
@@ -544,20 +539,6 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
           ]}
           emptyLabel="添加实践经历"
           textareaKeys={["description"]}
-        />
-      )}
-
-      {/* Awards */}
-      <SectionHeader section="awards" />
-      {expanded.awards && (
-        <DynamicList
-          items={awards}
-          onChange={setAwards}
-          fields={[
-            { key: "title", label: "奖项名称", placeholder: "ACM 程序设计竞赛一等奖" },
-            { key: "startDate", label: "时间", placeholder: "2023" },
-          ]}
-          emptyLabel="添加获奖荣誉"
         />
       )}
 
