@@ -6,7 +6,7 @@
 #   2. data/uploads/   —— 用户上传的图片（相册/封面/简历 PDF）
 #   3. git tag         —— 当前代码版本快照（用于代码回滚）
 # 三者的时间戳一致，恢复时配套使用。
-# 保留策略：最近 5 份，更旧的自动清理。
+# 保留策略：最近 2 份，更旧的自动清理。
 # ============================================================
 set -e
 cd "$(dirname "$0")/.."
@@ -39,9 +39,9 @@ else
   echo "    ✓ 代码快照 -> git tag $TAG"
 fi
 
-# 4. 清理旧备份（保留最近 5 份）
-ls -t dev.db.bak.* 2>/dev/null | tail -n +6 | xargs -r rm -f
-ls -t uploads.bak.*.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm -f
-echo "    ✓ 已清理 5 份之前的旧备份"
+# 4. 清理旧备份（保留最近 2 份）
+ls -t dev.db.bak.* 2>/dev/null | tail -n +3 | xargs -r rm -f
+ls -t uploads.bak.*.tar.gz 2>/dev/null | tail -n +3 | xargs -r rm -f
+echo "    ✓ 已清理 2 份之前的旧备份"
 
 echo "==> 备份完成"
