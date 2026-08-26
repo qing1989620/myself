@@ -22,6 +22,7 @@ export default function RightColumn({
               <TimelineItem
                 key={item.id ?? item.title}
                 title={item.title}
+                subtitle={item.subtitle || undefined}
                 date={formatDateRange(item.startDate, item.endDate)}
                 description={item.description || ""}
                 tech={item.techStack || undefined}
@@ -42,6 +43,7 @@ export default function RightColumn({
               <TimelineItem
                 key={item.id ?? item.title}
                 title={item.title}
+                subtitle={item.subtitle || undefined}
                 date={formatDateRange(item.startDate, item.endDate)}
                 description={item.description || ""}
                 tech={item.techStack || undefined}
@@ -69,11 +71,13 @@ function formatDateRange(start?: string | null, end?: string | null): string {
 
 function TimelineItem({
   title,
+  subtitle,
   date,
   description,
   tech,
 }: {
   title: string
+  subtitle?: string
   date: string
   description: string
   tech?: string
@@ -81,7 +85,12 @@ function TimelineItem({
   return (
     <div className="relative pl-4 border-l-2 border-gray-100">
       <div className="flex justify-between items-start gap-3">
-        <h4 className="font-semibold text-gray-900 min-w-0">{title}</h4>
+        <div className="min-w-0">
+          <h4 className="font-semibold text-gray-900">{title}</h4>
+          {subtitle && (
+            <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>
+          )}
+        </div>
         {date && (
           <span className="text-xs text-gray-400 whitespace-nowrap shrink-0 pt-0.5">{date}</span>
         )}
