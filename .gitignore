@@ -46,6 +46,7 @@ next-env.d.ts
 # sqlite
 *.db
 dev.db.bak.*
+uploads.bak.*.tar.gz
 
 # user uploads
 public/images/uploads/
