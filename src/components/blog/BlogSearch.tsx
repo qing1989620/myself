@@ -23,7 +23,7 @@ export default function BlogSearch() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative max-w-md mx-auto mb-10"
+      className="relative w-full sm:w-64 ml-auto mb-8"
       role="search"
     >
       <Search
@@ -34,9 +34,9 @@ export default function BlogSearch() {
         type="search"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        placeholder="搜索文章标题或摘要..."
+        placeholder="搜索文章..."
         aria-label="搜索文章"
-        className="w-full pl-10 pr-9 py-2.5 rounded-full border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all"
+        className="w-full pl-10 pr-9 py-2 rounded-full border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all"
       />
       {keyword && (
         <button
