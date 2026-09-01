@@ -28,7 +28,7 @@ export default function ArticleCard({
   return (
     <Link
       href={`/blog/${slug}`}
-      className="group block bg-paper border border-gray-200 overflow-hidden hover:border-gray-400 transition-all duration-200"
+      className="group block bg-white border border-gray-200 shadow-sm overflow-hidden hover:border-gray-400 hover:shadow-md transition-all duration-200"
     >
       {/* 封面图（有图时展示，3:1 横幅） */}
       {coverImage && (
