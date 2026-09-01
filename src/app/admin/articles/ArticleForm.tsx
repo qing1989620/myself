@@ -1,10 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
-import { Loader2, Save, Eye, EyeOff, Pin, PinOff } from "lucide-react"
+import {
+  Loader2,
+  Save,
+  Eye,
+  EyeOff,
+  Pin,
+  PinOff,
+  ImageIcon,
+  X,
+} from "lucide-react"
 import { useToast } from "@/components/ui/Toast"
+import { uploadWithProgress } from "@/lib/upload"
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
@@ -25,6 +35,7 @@ interface ArticleFormProps {
     slug: string
     summary: string
     content: string
+    coverImage?: string | null
     published: boolean
     pinned: boolean
     collectionId?: number | null
@@ -38,6 +49,10 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
   const [title, setTitle] = useState(initialData?.title || "")
   const [summary, setSummary] = useState(initialData?.summary || "")
   const [content, setContent] = useState(initialData?.content || "")
+  const [coverImage, setCoverImage] = useState(initialData?.coverImage || "")
+  const [coverUploading, setCoverUploading] = useState(false)
+  const [coverProgress, setCoverProgress] = useState(0)
+  const coverInputRef = useRef<HTMLInputElement>(null)
   const [collectionId, setCollectionId] = useState<number | null>(
     initialData?.collectionId ?? null
   )
@@ -51,6 +66,55 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
   const [error, setError] = useState("")
 
   const isEditing = !!initialData
+
+  const handleCoverSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    if (!allowedTypes.includes(file.type)) {
+      setError("仅支持 JPG、PNG、GIF、WebP 格式的图片")
+      e.target.value = ""
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("图片大小不能超过 10MB")
+      e.target.value = ""
+      return
+    }
+
+    setCoverUploading(true)
+    setCoverProgress(0)
+    setError("")
+
+    const formData = new FormData()
+    formData.append("file", file)
+
+    try {
+      const res = await uploadWithProgress(
+        "/api/upload",
+        formData,
+        setCoverProgress
+      )
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        setError(data?.error || "封面上传失败")
+        setCoverUploading(false)
+        return
+      }
+
+      if (data?.url) {
+        setCoverImage(data.url)
+        toast("封面上传成功", "success")
+      }
+    } catch {
+      setError("封面上传失败，请重试")
+    } finally {
+      setCoverUploading(false)
+      e.target.value = ""
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,7 +141,15 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, summary, content, published, pinned, collectionId }),
+        body: JSON.stringify({
+          title,
+          summary,
+          content,
+          coverImage,
+          published,
+          pinned,
+          collectionId,
+        }),
       })
 
       if (!res.ok) {
@@ -96,7 +168,8 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
     }
   }
 
-  return (    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
       {error && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
           {error}
@@ -123,6 +196,67 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
           rows={2}
           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all text-sm resize-none"
         />
+      </div>
+
+      {/* Cover image */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          封面图（可选，显示在文章列表顶部横幅）
+        </label>
+        {coverImage ? (
+          <div className="relative w-full max-w-md aspect-[3/1] rounded-xl overflow-hidden border border-gray-200 bg-gray-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={coverImage}
+              alt="封面预览"
+              className="w-full h-full object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => setCoverImage("")}
+              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+              title="移除封面"
+              aria-label="移除封面"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => coverInputRef.current?.click()}
+            disabled={coverUploading}
+            className="w-full max-w-md aspect-[3/1] rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors disabled:opacity-60"
+          >
+            {coverUploading ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                <span className="text-xs">上传中 {coverProgress}%</span>
+              </>
+            ) : (
+              <>
+                <ImageIcon size={20} />
+                <span className="text-xs">选择封面图片</span>
+              </>
+            )}
+          </button>
+        )}
+        <input
+          ref={coverInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          onChange={handleCoverSelect}
+          className="hidden"
+        />
+        {/* 上传进度条 */}
+        {coverUploading && (
+          <div className="w-full max-w-md h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2">
+            <div
+              className="h-full bg-accent rounded-full transition-[width] duration-200 ease-out"
+              style={{ width: `${coverProgress}%` }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Collection */}
