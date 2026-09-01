@@ -15,7 +15,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, email, password } = await req.json()
+    const { name, email: rawEmail, password } = await req.json()
+
+    // 统一邮箱格式：trim + 小写（SQLite unique 大小写敏感，避免重复账号/登录失败）
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : ""
 
     // Validation
     if (!name || !email || !password) {

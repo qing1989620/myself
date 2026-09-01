@@ -21,7 +21,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        const email = credentials.email as string
+        // 统一邮箱格式（trim + 小写），与注册时一致，避免大小写导致登录失败
+        const email = String(credentials.email).trim().toLowerCase()
 
         // 频率限制：每个邮箱+IP 每分钟最多 5 次登录尝试
         const ip = getClientIp(request as unknown as Request)
