@@ -87,6 +87,17 @@ export default async function CollectionDetailPage({ params, searchParams }: Pro
         </Link>
 
         <div className="mb-10">
+          {/* 合集封面横幅（可选） */}
+          {collection.coverImage && (
+            <div className="relative h-44 rounded-2xl overflow-hidden bg-gray-100 mb-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={collection.coverImage}
+                alt={collection.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
           <h1 className="text-3xl font-bold text-gray-900">{collection.name}</h1>
           {collection.description && (
             <p className="text-gray-500 mt-2">{collection.description}</p>

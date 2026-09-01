@@ -11,6 +11,15 @@ export default function ResumeHeader({
   return (
     <section className="resume-header-print py-16 px-4 bg-gradient-to-r from-brand-navy to-gray-800 text-white">
       <div className="max-w-5xl mx-auto text-center space-y-4">
+        {/* 头像（可选） */}
+        {profile?.avatar && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={profile.avatar}
+            alt={profile.name || "头像"}
+            className="no-print mx-auto w-28 h-28 rounded-full object-cover ring-4 ring-white/20"
+          />
+        )}
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
           {profile?.name || "未设置姓名"}
         </h1>

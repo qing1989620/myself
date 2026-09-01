@@ -117,6 +117,12 @@ export default async function BlogDetailPage({
               {article.summary}
             </p>
           )}
+          {/* 作者简介（可选） */}
+          {article.author.bio && (
+            <p className="text-sm text-gray-400 mt-4">
+              👤 {article.author.name}：{article.author.bio}
+            </p>
+          )}
         </header>
 
         {/* Content */}

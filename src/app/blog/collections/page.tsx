@@ -14,7 +14,12 @@ export const metadata: Metadata = {
 export default async function CollectionsPage() {
   const collections = await prisma.collection.findMany({
     orderBy: { sortOrder: "asc" },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      coverImage: true,
       _count: {
         select: { articles: { where: { published: true } } },
       },
@@ -44,8 +49,20 @@ export default async function CollectionsPage() {
               <Link
                 key={c.id}
                 href={`/blog/collections/${c.slug}`}
-                className="group bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
               >
+                {/* 合集封面（可选） */}
+                {c.coverImage ? (
+                  <div className="relative h-32 bg-gray-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={c.coverImage}
+                      alt={c.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                ) : null}
+                <div className="p-6">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
                     <FolderOpen size={20} className="text-gray-600" />
@@ -64,6 +81,7 @@ export default async function CollectionsPage() {
                   <span>
                     {c._count.articles} 篇文章
                   </span>
+                </div>
                 </div>
               </Link>
             ))}

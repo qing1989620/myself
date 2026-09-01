@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Save, Plus, Trash2, ChevronDown, ChevronUp, Upload } from "lucide-react"
 import { uploadWithProgress } from "@/lib/upload"
+import type { ResumeProfileData } from "@/lib/resume-helpers"
 
 interface SkillItem {
   name: string
@@ -26,6 +27,7 @@ interface ProfileData {
   email: string
   phone: string
   location: string
+  avatar: string
   birthDate: string
   birthplace: string
   degree: string
@@ -39,7 +41,7 @@ interface ProfileData {
 
 interface ResumeFormProps {
   initialData?: {
-    profile: ProfileData | null
+    profile: ResumeProfileData | null
     skills: (SkillItem & { id?: number | null; sortOrder: number })[]
     experiences: (ExperienceItem & {
       id?: number | null
@@ -83,6 +85,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     email: initialData?.profile?.email || "",
     phone: initialData?.profile?.phone || "",
     location: initialData?.profile?.location || "",
+    avatar: initialData?.profile?.avatar || "",
     birthDate: initialData?.profile?.birthDate || "",
     birthplace: initialData?.profile?.birthplace || "",
     degree: initialData?.profile?.degree || "",
@@ -154,6 +157,9 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
   const [success, setSuccess] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarProgress, setAvatarProgress] = useState(0)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
   const [pdfFile, setPdfFile] = useState<string | null>(
     initialData?.profile?.resumePdf || null
   )
@@ -220,6 +226,58 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     } catch {
       setError("网络错误")
       setLoading(false)
+    }
+  }
+
+  /** 头像上传（复用 /api/upload + 进度条） */
+  const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    if (!allowedTypes.includes(file.type)) {
+      setError("仅支持 JPG、PNG、GIF、WebP 格式的图片")
+      e.target.value = ""
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("图片大小不能超过 10MB")
+      e.target.value = ""
+      return
+    }
+
+    setAvatarUploading(true)
+    setAvatarProgress(0)
+    setError("")
+
+    const formData = new FormData()
+    formData.append("file", file)
+
+    try {
+      const res = await uploadWithProgress(
+        "/api/upload",
+        formData,
+        setAvatarProgress
+      )
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        setError(data?.error || "头像上传失败")
+        setAvatarUploading(false)
+        return
+      }
+
+      if (data?.url) {
+        updateProfile("avatar", data.url)
+        setSuccess(true)
+        if (successTimer.current) clearTimeout(successTimer.current)
+        successTimer.current = setTimeout(() => setSuccess(false), 3000)
+      }
+    } catch {
+      setError("头像上传失败，请重试")
+    } finally {
+      setAvatarUploading(false)
+      e.target.value = ""
     }
   }
 
@@ -328,6 +386,56 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
       <SectionHeader section="profile" />
       {expanded.profile && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-white rounded-xl border border-gray-100">
+          {/* 头像上传 */}
+          <div className="sm:col-span-2 flex items-center gap-4">
+            {profile.avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={profile.avatar}
+                alt="头像预览"
+                className="w-16 h-16 rounded-full object-cover border border-gray-200"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-gray-400">
+                <Upload size={20} />
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                {avatarUploading ? `上传中 ${avatarProgress}%` : "上传头像"}
+              </button>
+              {profile.avatar && (
+                <button
+                  type="button"
+                  onClick={() => updateProfile("avatar", "")}
+                  className="block text-xs text-red-500 hover:underline"
+                >
+                  移除头像
+                </button>
+              )}
+              <p className="text-xs text-gray-400">建议正方形图片，将显示在简历页头部</p>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                onChange={handleAvatarSelect}
+                className="hidden"
+              />
+            </div>
+            {avatarUploading && (
+              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-accent rounded-full transition-[width] duration-200 ease-out"
+                  style={{ width: `${avatarProgress}%` }}
+                />
+              </div>
+            )}
+          </div>
           {[
             { key: "name", label: "姓名", placeholder: "张三" },
             { key: "title", label: "职位头衔", placeholder: "全栈开发工程师" },

@@ -120,7 +120,12 @@ export default async function BlogListPage({
           </div>
         )}
 
-        {!q && <Pagination currentPage={page} totalPages={data.totalPages} />}
+        {/* 搜索时也显示分页，页码携带 q 关键词 */}
+        <Pagination
+          currentPage={page}
+          totalPages={data.totalPages}
+          baseUrl={q ? `/blog?q=${encodeURIComponent(q)}` : "/blog"}
+        />
       </div>
     </ViewTransition>
   )
