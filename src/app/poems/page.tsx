@@ -40,13 +40,15 @@ export default async function PoemsPage() {
                 <p className="text-gray-800 leading-loose whitespace-pre-line">
                   {poem.content}
                 </p>
-                {/* 作者 · 出处 */}
-                <p className="text-right text-sm text-gray-500 mt-6">
-                  —— {poem.author}
-                  {poem.source ? (
-                    <span className="text-gray-400">《{poem.source.replace(/[《》]/g, "")}》</span>
-                  ) : null}
-                </p>
+                {/* 作者 · 出处（均可选） */}
+                {(poem.author || poem.source) && (
+                  <p className="text-right text-sm text-gray-500 mt-6">
+                    {poem.author ? `—— ${poem.author}` : ""}
+                    {poem.source ? (
+                      <span className="text-gray-400">《{poem.source.replace(/[《》]/g, "")}》</span>
+                    ) : null}
+                  </p>
+                )}
               </div>
             ))}
           </div>

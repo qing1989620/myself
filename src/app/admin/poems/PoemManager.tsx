@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/Toast"
 interface Poem {
   id: number
   content: string
-  author: string
+  author: string | null
   source: string | null
   sortOrder: number
 }
@@ -54,10 +54,6 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
       setError("请输入诗句内容")
       return
     }
-    if (!newAuthor.trim()) {
-      setError("请输入作者")
-      return
-    }
 
     setSaving(true)
     setError("")
@@ -93,7 +89,7 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
   const startEdit = (poem: Poem) => {
     setEditingId(poem.id)
     setEditContent(poem.content)
-    setEditAuthor(poem.author)
+    setEditAuthor(poem.author || "")
     setEditSource(poem.source || "")
     setEditSortOrder(poem.sortOrder)
   }
@@ -188,7 +184,9 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">作者</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                作者（可选）
+              </label>
               <input
                 type="text"
                 value={newAuthor}
@@ -281,7 +279,7 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
                       type="text"
                       value={editAuthor}
                       onChange={(e) => setEditAuthor(e.target.value)}
-                      placeholder="作者"
+                      placeholder="作者（可选）"
                       className={inputClass}
                     />
                     <input
@@ -329,7 +327,7 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
                       {poem.content}
                     </p>
                     <p className="text-xs text-gray-400 mt-2">
-                      —— {poem.author}
+                      {poem.author ? `—— ${poem.author}` : ""}
                       {poem.source ? `《${poem.source.replace(/[《》]/g, "")}》` : ""}
                       <span className="ml-2 text-gray-300">#{poem.sortOrder}</span>
                     </p>

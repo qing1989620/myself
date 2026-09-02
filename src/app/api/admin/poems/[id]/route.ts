@@ -26,7 +26,7 @@ export async function PUT(
       where: { id: parseInt(id) },
       data: {
         content: content !== undefined ? content.trim() : existing.content,
-        author: author !== undefined ? author.trim() : existing.author,
+        author: author !== undefined ? (author.trim() || null) : existing.author,
         source: source !== undefined ? (source.trim() || null) : existing.source,
         sortOrder: sortOrder !== undefined ? sortOrder : existing.sortOrder,
       },

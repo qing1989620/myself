@@ -27,17 +27,11 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       )
     }
-    if (!author || !author.trim()) {
-      return NextResponse.json(
-        { error: "作者为必填项" },
-        { status: 400 }
-      )
-    }
 
     const poem = await prisma.poem.create({
       data: {
         content: content.trim(),
-        author: author.trim(),
+        author: author?.trim() || null,
         source: source?.trim() || null,
         sortOrder: sortOrder ?? 0,
       },

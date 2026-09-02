@@ -11,17 +11,17 @@ export default function HobbiesSection() {
           <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded-full" />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 sm:gap-5">
           {PHOTO_CATEGORIES.map((category) => {
             const Icon = HOBBY_ICONS[category.slug]
             return (
               <Link
                 key={category.slug}
                 href={`/photos/${category.slug}`}
-                className="flex flex-col items-center gap-3 p-6 w-32 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+                className="flex flex-col items-center gap-2.5 p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
               >
                 <Icon
-                  size={32}
+                  size={28}
                   className={`${category.color} group-hover:scale-110 transition-transform`}
                 />
                 <span className="text-sm font-medium text-gray-600">
@@ -31,13 +31,13 @@ export default function HobbiesSection() {
             )
           })}
 
-          {/* 拾章：诗词收藏 */}
+          {/* 拾章：诗词收藏（与六栏目同一行） */}
           <Link
             href="/poems"
-            className="flex flex-col items-center gap-3 p-6 w-32 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+            className="flex flex-col items-center gap-2.5 p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
           >
             <ScrollText
-              size={32}
+              size={28}
               className="text-red-400 group-hover:scale-110 transition-transform"
             />
             <span className="text-sm font-medium text-gray-600">拾章</span>
