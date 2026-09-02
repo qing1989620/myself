@@ -1,27 +1,41 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireOwner } from "@/lib/auth-helpers"
+import { requirePermission } from "@/lib/auth-helpers"
 import { generateSlug } from "@/lib/utils"
+
+/** 校验操作权限：OWNER 全权；授权读者仅能操作自己创建的文章 */
+async function checkArticleAccess(articleId: number) {
+  const user = await requirePermission("article")
+  if (user instanceof NextResponse) return user
+
+  const existing = await prisma.article.findUnique({
+    where: { id: articleId },
+  })
+  if (!existing) {
+    return NextResponse.json({ error: "文章不存在" }, { status: 404 })
+  }
+
+  if (user.role !== "OWNER" && existing.authorId !== parseInt(user.id)) {
+    return NextResponse.json(
+      { error: "只能操作自己创建的文章" },
+      { status: 403 }
+    )
+  }
+  return { user, existing }
+}
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const access = await checkArticleAccess(parseInt((await params).id))
+  if (access instanceof NextResponse) return access
+  const { existing } = access
 
   try {
     const { id } = await params
     const body = await req.json()
     const { title, summary, content, coverImage, published, pinned, collectionId } = body
-
-    const existing = await prisma.article.findUnique({
-      where: { id: parseInt(id) },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: "文章不存在" }, { status: 404 })
-    }
 
     // Update slug if title changed
     let slug = existing.slug
@@ -63,22 +77,13 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const access = await checkArticleAccess(parseInt((await params).id))
+  if (access instanceof NextResponse) return access
+  const { existing } = access
 
   try {
-    const { id } = await params
-
-    const existing = await prisma.article.findUnique({
-      where: { id: parseInt(id) },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: "文章不存在" }, { status: 404 })
-    }
-
     await prisma.article.delete({
-      where: { id: parseInt(id) },
+      where: { id: existing.id },
     })
 
     return NextResponse.json({ message: "文章已删除" })

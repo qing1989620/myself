@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import PoemManager from "./PoemManager"
 
 export const metadata: Metadata = {
@@ -7,7 +8,13 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminPoemsPage() {
+  const user = await getCurrentUser()
+  // 授权读者只能看到自己添加的诗词（站长看全部）
+  const where =
+    user?.role === "OWNER" ? {} : { authorId: parseInt(user?.id || "0") }
+
   const poems = await prisma.poem.findMany({
+    where,
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   })
 

@@ -1,29 +1,43 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireOwner } from "@/lib/auth-helpers"
+import { requirePermission } from "@/lib/auth-helpers"
 import { isValidPhotoCategory } from "@/lib/photo-categories"
 import { unlink } from "fs/promises"
 import path from "path"
+
+/** 校验操作权限：OWNER 全权；授权读者仅能操作自己上传的照片 */
+async function checkPhotoAccess(photoId: number) {
+  const user = await requirePermission("photo")
+  if (user instanceof NextResponse) return user
+
+  const existing = await prisma.photo.findUnique({
+    where: { id: photoId },
+  })
+  if (!existing) {
+    return NextResponse.json({ error: "照片不存在" }, { status: 404 })
+  }
+
+  if (user.role !== "OWNER" && existing.authorId !== parseInt(user.id)) {
+    return NextResponse.json(
+      { error: "只能操作自己上传的照片" },
+      { status: 403 }
+    )
+  }
+  return { user, existing }
+}
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const access = await checkPhotoAccess(parseInt((await params).id))
+  if (access instanceof NextResponse) return access
+  const { existing } = access
 
   try {
     const { id } = await params
     const body = await req.json()
     const { category, title, description, sortOrder } = body
-
-    const existing = await prisma.photo.findUnique({
-      where: { id: parseInt(id) },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: "照片不存在" }, { status: 404 })
-    }
 
     if (category && !isValidPhotoCategory(category)) {
       return NextResponse.json(
@@ -56,23 +70,14 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const access = await checkPhotoAccess(parseInt((await params).id))
+  if (access instanceof NextResponse) return access
+  const { existing } = access
 
   try {
-    const { id } = await params
-
-    const existing = await prisma.photo.findUnique({
-      where: { id: parseInt(id) },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: "照片不存在" }, { status: 404 })
-    }
-
     // Delete from database
     await prisma.photo.delete({
-      where: { id: parseInt(id) },
+      where: { id: existing.id },
     })
 
     // Delete file from disk (tolerant of missing file)

@@ -8,19 +8,22 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  name      String
-  role      String    @default("READER")
-  avatar    String?
-  bio       String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  articles  Article[]
-  comments  Comment[]
-  sessions  Session[]
-  accounts  Account[]
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  name        String
+  role        String    @default("READER")
+  avatar      String?
+  bio         String?
+  permissions String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
+  comments    Comment[]
+  photos      Photo[]
+  poems       Poem[]
+  sessions    Session[]
+  accounts    Account[]
 }
 
 model Session {
@@ -99,8 +102,8 @@ model Comment {
   content   String
   articleId Int
   article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  authorId  Int
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  Int?
+  author    User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
   parentId  Int?
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies   Comment[] @relation("CommentReplies")
@@ -170,6 +173,8 @@ model Photo {
   width       Int?
   height      Int?
   sortOrder   Int      @default(0)
+  authorId    Int?
+  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -183,6 +188,8 @@ model Poem {
   author    String?
   source    String?
   sortOrder Int      @default(0)
+  authorId  Int?
+  user      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

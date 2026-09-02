@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import { formatDate } from "@/lib/utils"
 import CommentDeleteButton from "./CommentDeleteButton"
 import Pagination from "@/components/blog/Pagination"
@@ -16,6 +18,10 @@ export default async function AdminCommentsPage({
 }: {
   searchParams: Promise<{ page?: string }>
 }) {
+  // 评论管理为站长专属
+  const user = await getCurrentUser()
+  if (user?.role !== "OWNER") redirect("/admin")
+
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page || "1"))
   const skip = (page - 1) * PAGE_SIZE
@@ -62,7 +68,9 @@ export default async function AdminCommentsPage({
                     <p className="line-clamp-2">{comment.content}</p>
                   </td>
                   <td className="px-5 py-3 text-gray-600">
-                    {comment.author.name || comment.author.email}
+                    {comment.author
+                      ? comment.author.name || comment.author.email
+                      : "匿名用户"}
                   </td>
                   <td className="px-5 py-3">
                     <Link

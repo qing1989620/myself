@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import PhotoManager from "./PhotoManager"
 
 export const metadata: Metadata = {
@@ -7,7 +8,13 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminPhotosPage() {
+  const user = await getCurrentUser()
+  // 授权读者只能看到自己上传的照片（站长看全部）
+  const where =
+    user?.role === "OWNER" ? {} : { authorId: parseInt(user?.id || "0") }
+
   const photos = await prisma.photo.findMany({
+    where,
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   })
 

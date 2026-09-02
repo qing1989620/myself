@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireOwner } from "@/lib/auth-helpers"
+import { requirePermission } from "@/lib/auth-helpers"
 import { generateSlug } from "@/lib/utils"
 
 export async function GET(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const user = await requirePermission("article")
+  if (user instanceof NextResponse) return user
 
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get("page") || "1")
   const limit = parseInt(searchParams.get("limit") || "20")
   const skip = (page - 1) * limit
 
+  // 授权读者只能看到自己创建的文章（站长看全部）
+  const where = user.role === "OWNER" ? {} : { authorId: parseInt(user.id) }
+
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
+      where,
       orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
       skip,
       take: limit,
@@ -26,7 +30,7 @@ export async function GET(req: NextRequest) {
         },
       },
     }),
-    prisma.article.count(),
+    prisma.article.count({ where }),
   ])
 
   return NextResponse.json({
@@ -39,8 +43,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const user = await requirePermission("article")
+  if (user instanceof NextResponse) return user
 
   try {
     const body = await req.json()
@@ -71,7 +75,8 @@ export async function POST(req: NextRequest) {
         coverImage: coverImage || "",
         published: published || false,
         pinned: pinned || false,
-        authorId: (await getOwnerId())!,
+        // 记录创建者：授权读者创建的归属自己，站长创建的归属站长
+        authorId: parseInt(user.id),
         collectionId: collectionId || null,
       },
     })
@@ -84,11 +89,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-async function getOwnerId(): Promise<number | null> {
-  const owner = await prisma.user.findFirst({
-    where: { role: "OWNER" },
-  })
-  return owner?.id ?? null
 }

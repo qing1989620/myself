@@ -57,6 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.email,
             name: user.name,
             role: user.role,
+            permissions: user.permissions,
           }
         } catch (err) {
           console.error("[auth] authorize error:", err)
@@ -73,6 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         ;(token as any).id = user.id
         ;(token as any).role = (user as any).role
+        ;(token as any).permissions = (user as any).permissions
       }
       return token
     },
@@ -80,6 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         ;(session.user as any).id = (token as any).id
         ;(session.user as any).role = (token as any).role
+        ;(session.user as any).permissions = (token as any).permissions
       }
       return session
     },

@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import { FileText, MessageSquare, Eye, PenLine } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -8,6 +10,10 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminDashboard() {
+  // 仪表盘为站长专属（读者无权限时由 layout 拦截，此处双重保险）
+  const user = await getCurrentUser()
+  if (user?.role !== "OWNER") redirect("/admin/articles")
+
   const [totalArticles, publishedArticles, totalComments, totalViews] =
     await Promise.all([
       prisma.article.count(),

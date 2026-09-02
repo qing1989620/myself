@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { getCurrentUser } from "@/lib/auth-helpers"
+import { getCurrentUser, hasPermission } from "@/lib/auth-helpers"
 import AdminSidebar from "@/components/layout/AdminSidebar"
 
 export default async function AdminLayout({
@@ -13,7 +13,14 @@ export default async function AdminLayout({
     redirect("/auth/login?callbackUrl=/admin")
   }
 
-  if (user.role !== "OWNER") {
+  // 站长全权限；读者需拥有任一功能权限（文章/相册/拾章）才能进入后台
+  const allowed =
+    user.role === "OWNER" ||
+    hasPermission(user, "article") ||
+    hasPermission(user, "photo") ||
+    hasPermission(user, "poem")
+
+  if (!allowed) {
     redirect("/")
   }
 

@@ -1,11 +1,17 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import PasswordForm from "./PasswordForm"
 
 export const metadata: Metadata = {
   title: "账号设置 - 管理后台",
 }
 
-export default function AdminSettingsPage() {
+export default async function AdminSettingsPage() {
+  // 账号设置为站长专属
+  const user = await getCurrentUser()
+  if (user?.role !== "OWNER") redirect("/admin")
+
   return (
     <div className="space-y-6">
       <div>

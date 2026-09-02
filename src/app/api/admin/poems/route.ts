@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireOwner } from "@/lib/auth-helpers"
+import { requirePermission } from "@/lib/auth-helpers"
 
 export async function GET(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const user = await requirePermission("poem")
+  if (user instanceof NextResponse) return user
+
+  // 授权读者只能看到自己添加的诗词（站长看全部）
+  const where = user.role === "OWNER" ? {} : { authorId: parseInt(user.id) }
 
   const poems = await prisma.poem.findMany({
+    where,
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   })
 
@@ -14,8 +18,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const user = await requirePermission("poem")
+  if (user instanceof NextResponse) return user
 
   try {
     const body = await req.json()
@@ -34,6 +38,8 @@ export async function POST(req: NextRequest) {
         author: author?.trim() || null,
         source: source?.trim() || null,
         sortOrder: sortOrder ?? 0,
+        // 记录添加者：授权读者添加的归属自己
+        authorId: parseInt(user.id),
       },
     })
 

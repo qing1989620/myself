@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import { getResumeData } from "@/lib/resume-helpers"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import ResumeForm from "./ResumeForm"
 
 export const metadata: Metadata = {
@@ -7,6 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminResumePage() {
+  // 简历编辑为站长专属
+  const user = await getCurrentUser()
+  if (user?.role !== "OWNER") redirect("/admin")
+
   const data = await getResumeData()
 
   return (

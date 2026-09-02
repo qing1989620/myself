@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import {
   LayoutDashboard,
   FileText,
@@ -14,27 +14,38 @@ import {
   LogOut,
   Home,
   ScrollText,
+  Users,
 } from "lucide-react"
 
 const links = [
-  { href: "/admin", label: "仪表盘", icon: LayoutDashboard },
-  { href: "/admin/articles", label: "文章管理", icon: FileText },
-  { href: "/admin/collections", label: "合集管理", icon: FolderOpen },
-  { href: "/admin/photos", label: "相册管理", icon: ImageIcon },
-  { href: "/admin/poems", label: "拾章管理", icon: ScrollText },
-  { href: "/admin/comments", label: "评论管理", icon: MessageSquare },
-  { href: "/admin/resume", label: "简历编辑", icon: FileUser },
-  { href: "/admin/settings", label: "账号设置", icon: Settings },
+  { href: "/admin", label: "仪表盘", icon: LayoutDashboard, perm: null },
+  { href: "/admin/articles", label: "文章管理", icon: FileText, perm: "article" },
+  { href: "/admin/collections", label: "合集管理", icon: FolderOpen, perm: null },
+  { href: "/admin/photos", label: "相册管理", icon: ImageIcon, perm: "photo" },
+  { href: "/admin/poems", label: "拾章管理", icon: ScrollText, perm: "poem" },
+  { href: "/admin/comments", label: "评论管理", icon: MessageSquare, perm: null },
+  { href: "/admin/resume", label: "简历编辑", icon: FileUser, perm: null },
+  { href: "/admin/users", label: "账号管理", icon: Users, perm: null },
+  { href: "/admin/settings", label: "账号设置", icon: Settings, perm: null },
 ]
 
 export default function AdminSidebar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const user = session?.user as any
+  const isOwner = user?.role === "OWNER"
+
+  // 站长看全部；读者只看到自己有权限的模块 + 仪表盘
+  const userPerms = (user?.permissions || "").split(",").map((p: string) => p.trim())
+  const visibleLinks = links.filter(
+    (link) => isOwner || link.perm === null || userPerms.includes(link.perm)
+  )
 
   return (
     <aside className="w-full md:w-56 bg-gray-900 text-white md:min-h-[calc(100vh-4rem)] p-4 flex flex-col">
       {/* 移动端：横向滚动菜单；桌面端：纵向固定侧栏 */}
       <nav className="flex md:flex-col gap-1 flex-1 overflow-x-auto md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0">
-        {links.map((link) => {
+        {visibleLinks.map((link) => {
           const isActive =
             pathname === link.href ||
             (link.href !== "/admin" && pathname.startsWith(link.href))

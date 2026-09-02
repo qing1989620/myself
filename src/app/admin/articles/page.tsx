@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Plus, Edit, Pin } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import { formatDate } from "@/lib/utils"
 import DeleteButton from "./DeleteButton"
 import Pagination from "@/components/blog/Pagination"
@@ -17,12 +18,18 @@ export default async function AdminArticlesPage({
 }: {
   searchParams: Promise<{ page?: string }>
 }) {
+  const user = await getCurrentUser()
+  // 授权读者只能看到自己创建的文章（站长看全部）
+  const where =
+    user?.role === "OWNER" ? {} : { authorId: parseInt(user?.id || "0") }
+
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page || "1"))
   const skip = (page - 1) * PAGE_SIZE
 
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
+      where,
       orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
       skip,
       take: PAGE_SIZE,
@@ -30,7 +37,7 @@ export default async function AdminArticlesPage({
         _count: { select: { comments: true } },
       },
     }),
-    prisma.article.count(),
+    prisma.article.count({ where }),
   ])
   const totalPages = Math.ceil(total / PAGE_SIZE)
 

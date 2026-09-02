@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import { Plus, Edit3 } from "lucide-react"
 import DeleteButton from "./DeleteButton"
 
@@ -9,6 +11,10 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminCollectionsPage() {
+  // 合集管理为站长专属
+  const user = await getCurrentUser()
+  if (user?.role !== "OWNER") redirect("/admin")
+
   const collections = await prisma.collection.findMany({
     orderBy: { sortOrder: "asc" },
     include: {

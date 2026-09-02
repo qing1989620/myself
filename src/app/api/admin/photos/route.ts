@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { requireOwner } from "@/lib/auth-helpers"
+import { requirePermission } from "@/lib/auth-helpers"
 import { isValidPhotoCategory } from "@/lib/photo-categories"
 
 export async function GET(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const user = await requirePermission("photo")
+  if (user instanceof NextResponse) return user
+
+  // 授权读者只能看到自己上传的照片（站长看全部）
+  const where = user.role === "OWNER" ? {} : { authorId: parseInt(user.id) }
 
   const photos = await prisma.photo.findMany({
+    where,
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   })
 
@@ -15,8 +19,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  const user = await requirePermission("photo")
+  if (user instanceof NextResponse) return user
 
   try {
     const body = await req.json()
@@ -62,6 +66,8 @@ export async function POST(req: NextRequest) {
         width: width || null,
         height: height || null,
         sortOrder: sortOrder ?? 0,
+        // 记录上传者：授权读者上传的归属自己
+        authorId: parseInt(user.id),
       },
     })
 
