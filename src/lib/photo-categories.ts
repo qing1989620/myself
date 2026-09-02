@@ -11,37 +11,37 @@ import {
 export const PHOTO_CATEGORIES = [
   {
     slug: "programming",
-    label: "编程",
+    label: "码砚",
     color: "text-blue-500",
     description: "写代码的那些时刻",
   },
   {
     slug: "gaming",
-    label: "游戏",
+    label: "弈趣",
     color: "text-purple-500",
     description: "游戏时光",
   },
   {
     slug: "sports",
-    label: "运动",
+    label: "驰野",
     color: "text-green-500",
     description: "运动日常",
   },
   {
     slug: "music",
-    label: "音乐",
+    label: "清弦",
     color: "text-pink-500",
     description: "音乐瞬间",
   },
   {
     slug: "photography",
-    label: "摄影",
+    label: "捕光",
     color: "text-orange-500",
     description: "镜头下的世界",
   },
   {
     slug: "coffee",
-    label: "咖啡",
+    label: "闲酌",
     color: "text-amber-600",
     description: "咖啡生活",
   },

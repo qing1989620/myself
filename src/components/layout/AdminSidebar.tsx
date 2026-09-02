@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   Home,
+  ScrollText,
 } from "lucide-react"
 
 const links = [
@@ -20,6 +21,7 @@ const links = [
   { href: "/admin/articles", label: "文章管理", icon: FileText },
   { href: "/admin/collections", label: "合集管理", icon: FolderOpen },
   { href: "/admin/photos", label: "相册管理", icon: ImageIcon },
+  { href: "/admin/poems", label: "拾章管理", icon: ScrollText },
   { href: "/admin/comments", label: "评论管理", icon: MessageSquare },
   { href: "/admin/resume", label: "简历编辑", icon: FileUser },
   { href: "/admin/settings", label: "账号设置", icon: Settings },

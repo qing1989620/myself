@@ -1,0 +1,57 @@
+import type { Metadata } from "next"
+import { ViewTransition } from "react"
+import { prisma } from "@/lib/prisma"
+
+export const metadata: Metadata = {
+  title: "拾章",
+  description: "收藏优美的诗词与文字，记录心动瞬间。",
+}
+
+export const dynamic = "force-dynamic"
+
+export default async function PoemsPage() {
+  const poems = await prisma.poem.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+  })
+
+  return (
+    <ViewTransition enter="auto" exit="auto" default="none">
+      <div className="max-w-5xl mx-auto px-4 py-16">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <h1 className="text-4xl font-bold text-gray-900">拾章</h1>
+          <div className="w-16 h-1 bg-accent mx-auto mt-4 rounded-full" />
+          <p className="text-gray-500 mt-4">拾取优美诗词，收藏心动字句</p>
+        </div>
+
+        {poems.length === 0 ? (
+          <div className="text-center py-20 text-gray-400">
+            <p className="text-lg">✒️ 还没有收藏任何诗词</p>
+            <p className="text-sm mt-2">敬请期待</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {poems.map((poem) => (
+              <div
+                key={poem.id}
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 flex flex-col justify-between hover:shadow-md transition-shadow duration-200"
+              >
+                {/* 诗句 */}
+                <p className="text-gray-800 leading-loose whitespace-pre-line">
+                  {poem.content}
+                </p>
+                {/* 作者 · 出处 */}
+                <p className="text-right text-sm text-gray-500 mt-6">
+                  —— {poem.author}
+                  {poem.source ? (
+                    <span className="text-gray-400">《{poem.source.replace(/[《》]/g, "")}》</span>
+                  ) : null}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </ViewTransition>
+  )
+}
