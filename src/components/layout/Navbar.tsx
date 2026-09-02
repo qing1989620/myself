@@ -22,6 +22,12 @@ export default function Navbar() {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href)
 
+  // 管理入口：站长 或 拥有任一内容权限（文章/相册/拾章）的授权读者
+  const userPerms = (user?.permissions || "").split(",").map((p: string) => p.trim())
+  const canManage =
+    user?.role === "OWNER" ||
+    ["article", "photo", "poem"].some((p) => userPerms.includes(p))
+
   return (
     <header className="sticky top-0 z-50 bg-paper/90 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +68,7 @@ export default function Navbar() {
               <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-sm" />
             ) : user ? (
               <div className="flex items-center gap-3">
-                {user.role === "OWNER" && (
+                {canManage && (
                   <Link
                     href="/admin"
                     className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
@@ -129,7 +135,7 @@ export default function Navbar() {
             <div className="w-full h-8 bg-gray-100 animate-pulse rounded-sm" />
           ) : user ? (
             <>
-              {user.role === "OWNER" && (
+              {canManage && (
                 <Link
                   href="/admin"
                   className="block text-sm text-gray-600 hover:text-gray-900"
