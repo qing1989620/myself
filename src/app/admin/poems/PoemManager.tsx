@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2, Check, X, Loader2, ScrollText } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { Plus, Trash2, Check, X, Loader2, ScrollText, Lock } from "lucide-react"
 import { useToast } from "@/components/ui/Toast"
 
 interface Poem {
@@ -11,6 +12,7 @@ interface Poem {
   author: string | null
   source: string | null
   sortOrder: number
+  authorId: number | null
 }
 
 interface PoemManagerProps {
@@ -20,6 +22,9 @@ interface PoemManagerProps {
 export default function PoemManager({ initialPoems }: PoemManagerProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: session } = useSession()
+  const myId = parseInt((session?.user as any)?.id || "0")
+  const isOwner = (session?.user as any)?.role === "OWNER"
   const [poems, setPoems] = useState<Poem[]>(initialPoems)
   const [error, setError] = useState("")
 
@@ -332,37 +337,50 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
                       <span className="ml-2 text-gray-300">#{poem.sortOrder}</span>
                     </p>
                   </div>
+                  {/* 操作：自己的诗词可编辑/删除，别人的只读 */}
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <button
-                      onClick={() => startEdit(poem)}
-                      className="p-1.5 text-gray-400 hover:text-accent transition-colors"
-                      title="编辑"
-                    >
-                      <ScrollText size={14} />
-                    </button>
-                    {deletingId === poem.id ? (
-                      <div className="flex gap-1">
+                    {isOwner || poem.authorId === myId ? (
+                      <>
                         <button
-                          onClick={() => handleDelete(poem.id)}
-                          className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                          onClick={() => startEdit(poem)}
+                          className="p-1.5 text-gray-400 hover:text-accent transition-colors"
+                          title="编辑"
                         >
-                          确认
+                          <ScrollText size={14} />
                         </button>
-                        <button
-                          onClick={() => setDeletingId(null)}
-                          className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200"
-                        >
-                          取消
-                        </button>
-                      </div>
+                        {deletingId === poem.id ? (
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => handleDelete(poem.id)}
+                              className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                            >
+                              确认
+                            </button>
+                            <button
+                              onClick={() => setDeletingId(null)}
+                              className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200"
+                            >
+                              取消
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setDeletingId(poem.id)}
+                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+                            title="删除"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </>
                     ) : (
-                      <button
-                        onClick={() => setDeletingId(poem.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
-                        title="删除"
+                      <span
+                        className="flex items-center gap-1 text-xs text-gray-300"
+                        title="只能操作自己添加的诗词"
                       >
-                        <Trash2 size={14} />
-                      </button>
+                        <Lock size={12} />
+                        只读
+                      </span>
                     )}
                   </div>
                 </div>

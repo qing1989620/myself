@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
-import { Upload, X, Check, Trash2, Edit3, Loader2 } from "lucide-react"
+import { Upload, X, Check, Trash2, Edit3, Loader2, Lock } from "lucide-react"
 import { PHOTO_CATEGORIES } from "@/lib/photo-categories"
 import { uploadWithProgress } from "@/lib/upload"
 
@@ -17,6 +18,7 @@ interface Photo {
   width: number | null
   height: number | null
   sortOrder: number
+  authorId: number | null
   createdAt: string
   updatedAt: string
 }
@@ -27,6 +29,9 @@ interface PhotoManagerProps {
 
 export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
   const router = useRouter()
+  const { data: session } = useSession()
+  const myId = parseInt((session?.user as any)?.id || "0")
+  const isOwner = (session?.user as any)?.role === "OWNER"
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
   const [filter, setFilter] = useState<string>("all")
   const [uploading, setUploading] = useState(false)
@@ -540,40 +545,52 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
                         <span className="text-xs text-gray-300">#{photo.sortOrder}</span>
                       </div>
 
-                      {/* Actions */}
+                      {/* Actions：自己的照片可编辑/删除，别人的只读 */}
                       <div className="flex items-center gap-1 mt-2">
-                        {deletingId === photo.id ? (
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => handleDelete(photo.id)}
-                              className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
-                            >
-                              确认
-                            </button>
-                            <button
-                              onClick={() => setDeletingId(null)}
-                              className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200"
-                            >
-                              取消
-                            </button>
-                          </div>
-                        ) : (
+                        {isOwner || photo.authorId === myId ? (
                           <>
-                            <button
-                              onClick={() => startEdit(photo)}
-                              className="p-1 text-gray-400 hover:text-accent transition-colors"
-                              title="编辑"
-                            >
-                              <Edit3 size={14} />
-                            </button>
-                            <button
-                              onClick={() => setDeletingId(photo.id)}
-                              className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                              title="删除"
-                            >
-                              <Trash2 size={14} />
-                            </button>
+                            {deletingId === photo.id ? (
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => handleDelete(photo.id)}
+                                  className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                                >
+                                  确认
+                                </button>
+                                <button
+                                  onClick={() => setDeletingId(null)}
+                                  className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200"
+                                >
+                                  取消
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => startEdit(photo)}
+                                  className="p-1 text-gray-400 hover:text-accent transition-colors"
+                                  title="编辑"
+                                >
+                                  <Edit3 size={14} />
+                                </button>
+                                <button
+                                  onClick={() => setDeletingId(photo.id)}
+                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                  title="删除"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </>
+                            )}
                           </>
+                        ) : (
+                          <span
+                            className="flex items-center gap-1 text-xs text-gray-300"
+                            title="只能操作自己上传的照片"
+                          >
+                            <Lock size={12} />
+                            只读
+                          </span>
                         )}
                       </div>
                     </>

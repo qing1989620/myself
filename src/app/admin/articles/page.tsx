@@ -19,9 +19,9 @@ export default async function AdminArticlesPage({
   searchParams: Promise<{ page?: string }>
 }) {
   const user = await getCurrentUser()
-  // 授权读者只能看到自己创建的文章（站长看全部）
-  const where =
-    user?.role === "OWNER" ? {} : { authorId: parseInt(user?.id || "0") }
+  const myId = parseInt(user?.id || "0")
+  const isOwner = user?.role === "OWNER"
+  // 看全部文章（含站长的）；授权读者只能操作自己创建的文章（别人的行只读）
 
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page || "1"))
@@ -29,15 +29,15 @@ export default async function AdminArticlesPage({
 
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
-      where,
       orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
       skip,
       take: PAGE_SIZE,
       include: {
+        author: { select: { id: true, name: true } },
         _count: { select: { comments: true } },
       },
     }),
-    prisma.article.count({ where }),
+    prisma.article.count(),
   ])
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -69,6 +69,7 @@ export default async function AdminArticlesPage({
                   <th className="text-left px-5 py-3 font-medium w-[35%]">
                     标题
                   </th>
+                  <th className="text-left px-5 py-3 font-medium">作者</th>
                   <th className="text-left px-5 py-3 font-medium">状态</th>
                   <th className="text-center px-5 py-3 font-medium w-[60px]">置顶</th>
                   <th className="text-left px-5 py-3 font-medium">评论</th>
@@ -82,6 +83,16 @@ export default async function AdminArticlesPage({
                     <td className="px-5 py-3">
                       <span className="text-gray-800 line-clamp-1">
                         {article.title}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3">
+                      <span className="text-xs text-gray-500">
+                        {article.author?.name || "未知"}
+                        {article.authorId === myId && (
+                          <span className="ml-1 text-xs px-1.5 py-0.5 rounded bg-blue-50 text-blue-600">
+                            我
+                          </span>
+                        )}
                       </span>
                     </td>
                     <td className="px-5 py-3">
@@ -110,14 +121,25 @@ export default async function AdminArticlesPage({
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/articles/${article.id}/edit`}
-                          className="p-1.5 text-gray-400 hover:text-accent transition-colors"
-                          title="编辑"
-                        >
-                          <Edit size={16} />
-                        </Link>
-                        <DeleteButton articleId={article.id} />
+                        {isOwner || article.authorId === myId ? (
+                          <>
+                            <Link
+                              href={`/admin/articles/${article.id}/edit`}
+                              className="p-1.5 text-gray-400 hover:text-accent transition-colors"
+                              title="编辑"
+                            >
+                              <Edit size={16} />
+                            </Link>
+                            <DeleteButton articleId={article.id} />
+                          </>
+                        ) : (
+                          <span
+                            className="text-xs text-gray-300"
+                            title="只能操作自己创建的文章"
+                          >
+                            只读
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>
