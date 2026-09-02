@@ -35,11 +35,11 @@ export default function AdminSidebar() {
   const user = session?.user as any
   const isOwner = user?.role === "OWNER"
 
-  // 站长看全部；读者只看到自己有权限的模块 + 仪表盘
+  // 站长看全部；读者只显示自己有权限的模块（站长专属菜单一律隐藏）
   const userPerms = (user?.permissions || "").split(",").map((p: string) => p.trim())
-  const visibleLinks = links.filter(
-    (link) => isOwner || link.perm === null || userPerms.includes(link.perm)
-  )
+  const visibleLinks = isOwner
+    ? links
+    : links.filter((link) => userPerms.includes(link.perm as string))
 
   return (
     <aside className="w-full md:w-56 bg-gray-900 text-white md:min-h-[calc(100vh-4rem)] p-4 flex flex-col">

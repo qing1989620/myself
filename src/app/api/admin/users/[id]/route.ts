@@ -122,6 +122,17 @@ export async function DELETE(
       )
     }
 
+    // 文章归属不可置空（schema 非空外键）：有文章时拒绝删除，避免外键错误
+    const articleCount = await prisma.article.count({
+      where: { authorId: targetId },
+    })
+    if (articleCount > 0) {
+      return NextResponse.json(
+        { error: `该账号有 ${articleCount} 篇文章，无法删除（文章归属不可匿名化）。请先删除或转交其文章。` },
+        { status: 409 }
+      )
+    }
+
     // 删除账号（评论/照片/诗词因外键 SetNull 自动匿名保留）
     await prisma.user.delete({
       where: { id: targetId },

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/auth-helpers"
 import ArticleForm from "../../ArticleForm"
 
 export const metadata: Metadata = {
@@ -25,6 +26,12 @@ export default async function EditArticlePage({
   ])
 
   if (!article) {
+    notFound()
+  }
+
+  // 越权防护：授权读者只能编辑自己创建的文章（返回 404 避免泄露他人内容）
+  const user = await getCurrentUser()
+  if (user?.role !== "OWNER" && article.authorId !== parseInt(user?.id || "0")) {
     notFound()
   }
 

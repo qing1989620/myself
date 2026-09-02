@@ -84,6 +84,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ;(session.user as any).role = (token as any).role
         ;(session.user as any).permissions = (token as any).permissions
       }
+      // 权限即时生效：每次会话读取时从数据库刷新角色与权限
+      // （站长收回/授予权限后无需等 JWT 过期，立即反映到 session）
+      try {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: parseInt((token as any).id as string) },
+          select: { role: true, permissions: true },
+        })
+        if (dbUser && session.user) {
+          ;(session.user as any).role = dbUser.role
+          ;(session.user as any).permissions = dbUser.permissions
+        }
+      } catch (err) {
+        console.error("[auth] session db refresh error:", err)
+      }
       return session
     },
   },

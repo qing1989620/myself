@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { requireOwner } from "@/lib/auth-helpers"
+import { getCurrentUser, hasPermission } from "@/lib/auth-helpers"
 import { writeFile, mkdir } from "fs/promises"
 import path from "path"
 import crypto from "crypto"
@@ -7,8 +7,18 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit"
 import { isAllowedImage } from "@/lib/file-type"
 
 export async function POST(req: NextRequest) {
-  const authError = await requireOwner()
-  if (authError) return authError
+  // 站长或拥有任一内容权限（文章/相册/拾章）的读者可上传图片
+  const user = await getCurrentUser()
+  if (!user) {
+    return NextResponse.json({ error: "请先登录" }, { status: 401 })
+  }
+  const hasContentPerm =
+    hasPermission(user, "article") ||
+    hasPermission(user, "photo") ||
+    hasPermission(user, "poem")
+  if (!hasContentPerm) {
+    return NextResponse.json({ error: "无权限上传" }, { status: 403 })
+  }
 
   // 频率限制：每用户每分钟最多 10 次上传
   const ip = getClientIp(req)
