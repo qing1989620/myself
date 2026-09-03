@@ -92,22 +92,6 @@ export default function RichTextEditor({
     },
   })
 
-  // Ctrl/Cmd+S：立即同步最新内容并提交所在表单
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault()
-        flushChange()
-        editor?.view.dom.closest("form")?.requestSubmit()
-      }
-    }
-    window.addEventListener("keydown", handler)
-    return () => {
-      window.removeEventListener("keydown", handler)
-      if (debounceTimer.current) clearTimeout(debounceTimer.current)
-    }
-  }, [editor, flushChange])
-
   const addImage = useCallback(() => {
     const input = document.createElement("input")
     input.type = "file"
@@ -164,6 +148,33 @@ export default function RichTextEditor({
     setLinkOpen(false)
   }, [editor, linkUrl])
 
+  // 快捷键：Ctrl/Cmd+S 保存；Ctrl/Cmd+Alt+I 插入图片
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // 保存：立即同步最新内容并提交所在表单
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === "s") {
+        e.preventDefault()
+        flushChange()
+        editor?.view.dom.closest("form")?.requestSubmit()
+        return
+      }
+      // 插入图片：打开文件选择框（I = Image）
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.altKey &&
+        e.key.toLowerCase() === "i"
+      ) {
+        e.preventDefault()
+        addImage()
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => {
+      window.removeEventListener("keydown", handler)
+      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    }
+  }, [editor, flushChange, addImage])
+
   if (!editor) {
     return (
       <div className="border border-gray-200 rounded-xl h-[400px] animate-pulse bg-gray-50" />
@@ -179,7 +190,7 @@ export default function RichTextEditor({
       />
       <EditorContent editor={editor} />
       <div className="flex items-center justify-between px-6 py-2 border-t border-gray-100 text-xs text-gray-400">
-        <span>Ctrl+S 保存</span>
+        <span>Ctrl+S 保存 · Ctrl+Alt+I 插图</span>
         <span>{wordCount} 字</span>
       </div>
 
