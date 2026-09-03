@@ -12,6 +12,10 @@ export const dynamic = "force-dynamic"
 export default async function PoemsPage() {
   const poems = await prisma.poem.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    include: {
+      // Poem.authorId 关联字段名是 user（author 是诗句作者文本）
+      user: { select: { name: true } },
+    },
   })
 
   return (
@@ -47,6 +51,12 @@ export default async function PoemsPage() {
                     {poem.source ? (
                       <span className="text-gray-400">《{poem.source.replace(/[《》]/g, "")}》</span>
                     ) : null}
+                  </p>
+                )}
+                {/* 收录人（上传账号被删后匿名不显示） */}
+                {poem.user?.name && (
+                  <p className="text-right text-xs text-gray-400 mt-1">
+                    由 {poem.user.name} 收录
                   </p>
                 )}
               </div>

@@ -10,6 +10,9 @@ export default async function AdminPhotosPage() {
   // 看全部照片（含站长的）；授权读者只能操作自己上传的照片（PhotoManager 内判断）
   const photos = await prisma.photo.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    include: {
+      author: { select: { name: true } },
+    },
   })
 
   // Serialize for client component

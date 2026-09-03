@@ -8,6 +8,7 @@ interface PhotoItem {
   url: string
   title: string | null
   description: string | null
+  author?: { name: string } | null
 }
 
 interface PhotoLightboxProps {
@@ -123,13 +124,19 @@ export default function PhotoLightbox({
             imgLoaded ? "" : "hidden"
           }`}
         />
-        {(photo.title || photo.description) && (
+        {(photo.title || photo.description || photo.author) && (
           <div className="mt-4 text-center text-white">
             {photo.title && (
               <p className="text-lg font-medium">{photo.title}</p>
             )}
             {photo.description && (
               <p className="text-sm text-gray-300 mt-1">{photo.description}</p>
+            )}
+            {/* 上传人（删号匿名后不显示） */}
+            {photo.author?.name && (
+              <p className="text-xs text-white/50 mt-2">
+                📷 由 {photo.author.name} 上传
+              </p>
             )}
           </div>
         )}

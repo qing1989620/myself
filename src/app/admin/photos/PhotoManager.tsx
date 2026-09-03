@@ -19,6 +19,7 @@ interface Photo {
   height: number | null
   sortOrder: number
   authorId: number | null
+  author?: { name: string } | null
   createdAt: string
   updatedAt: string
 }
@@ -544,6 +545,15 @@ export default function PhotoManager({ initialPhotos }: PhotoManagerProps) {
                         </span>
                         <span className="text-xs text-gray-300">#{photo.sortOrder}</span>
                       </div>
+                      {/* 上传人 */}
+                      {photo.author?.name && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          上传：{photo.author.name}
+                          {photo.authorId === myId && (
+                            <span className="ml-1 text-blue-600">（我）</span>
+                          )}
+                        </p>
+                      )}
 
                       {/* Actions：自己的照片可编辑/删除，别人的只读 */}
                       <div className="flex items-center gap-1 mt-2">

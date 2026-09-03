@@ -11,6 +11,7 @@ interface PhotoItem {
   description: string | null
   width: number | null
   height: number | null
+  author?: { name: string } | null
 }
 
 interface PhotoGridProps {

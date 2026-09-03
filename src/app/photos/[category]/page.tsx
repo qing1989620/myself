@@ -47,6 +47,7 @@ export default async function PhotoCategoryPage({ params }: Props) {
       description: true,
       width: true,
       height: true,
+      author: { select: { name: true } },
     },
   })
 

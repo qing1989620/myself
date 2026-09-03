@@ -10,6 +10,9 @@ export default async function AdminPoemsPage() {
   // 看全部诗词（含站长的）；授权读者只能操作自己添加的（PoemManager 内判断）
   const poems = await prisma.poem.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    include: {
+      user: { select: { name: true } },
+    },
   })
 
   return (

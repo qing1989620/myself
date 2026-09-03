@@ -13,6 +13,7 @@ interface Poem {
   source: string | null
   sortOrder: number
   authorId: number | null
+  user?: { name: string } | null
 }
 
 interface PoemManagerProps {
@@ -79,7 +80,11 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
         setSaving(false)
         return
       }
-      setPoems((prev) => [...prev, data])
+      // API 返回不含 user 关联，前端补上收录人（当前登录者）
+      setPoems((prev) => [
+        ...prev,
+        { ...data, user: { name: (session?.user as any)?.name || "我" } },
+      ])
       setShowForm(false)
       resetForm()
       toast("已添加", "success")
@@ -336,6 +341,15 @@ export default function PoemManager({ initialPoems }: PoemManagerProps) {
                       {poem.source ? `《${poem.source.replace(/[《》]/g, "")}》` : ""}
                       <span className="ml-2 text-gray-300">#{poem.sortOrder}</span>
                     </p>
+                    {/* 收录人 */}
+                    {poem.user?.name && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        收录：{poem.user.name}
+                        {poem.authorId === myId && (
+                          <span className="ml-1 text-blue-600">（我）</span>
+                        )}
+                      </p>
+                    )}
                   </div>
                   {/* 操作：自己的诗词可编辑/删除，别人的只读 */}
                   <div className="flex items-center gap-1 flex-shrink-0">
