@@ -6,18 +6,32 @@ import ImageExtension from "@tiptap/extension-image"
 import LinkExtension from "@tiptap/extension-link"
 import Placeholder from "@tiptap/extension-placeholder"
 import EditorToolbar from "./EditorToolbar"
-import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type Ref,
+} from "react"
 import { isSafeUrl } from "@/lib/utils"
 import { useToast } from "@/components/ui/Toast"
+
+export interface RichTextEditorHandle {
+  /** 同步获取编辑器最新内容（绕过防抖，保存前调用避免丢失刚插入的图片等） */
+  getLatestJson: () => string
+}
 
 interface RichTextEditorProps {
   content?: string
   onChange?: (json: string) => void
+  ref?: Ref<RichTextEditorHandle>
 }
 
 export default function RichTextEditor({
   content,
   onChange,
+  ref,
 }: RichTextEditorProps) {
   const [wordCount, setWordCount] = useState(0)
   const { toast } = useToast()
@@ -28,6 +42,11 @@ export default function RichTextEditor({
   // 防抖：长文输入时避免每次击键全量序列化 + 触发父组件重渲染
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const latestJson = useRef("")
+
+  // 暴露同步读取接口：保存时绕过防抖，拿到含最新改动（如图片插入）的完整内容
+  useImperativeHandle(ref, () => ({
+    getLatestJson: () => latestJson.current || content || "",
+  }))
 
   const flushChange = useCallback(() => {
     if (debounceTimer.current) {

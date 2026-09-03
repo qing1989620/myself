@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { useToast } from "@/components/ui/Toast"
 import { uploadWithProgress } from "@/lib/upload"
+import type { RichTextEditorHandle } from "@/components/editor/RichTextEditor"
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
@@ -64,6 +65,8 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
   )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  // 编辑器同步读取句柄（保存时绕过防抖取最新内容，避免刚插入的图片丢失）
+  const editorRef = useRef<RichTextEditorHandle>(null)
 
   const isEditing = !!initialData
 
@@ -124,8 +127,10 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
       setError("请输入文章标题")
       return
     }
+    // 保存前同步读取编辑器最新内容（绕过 300ms 防抖，防止刚插入的图片/文字丢失）
+    const finalContent = editorRef.current?.getLatestJson() ?? content
     // 空文校验：全删内容后 TipTap 序列化为 {"type":"doc","content":[]}，truthy 但无实际内容
-    if (!hasArticleContent(content)) {
+    if (!hasArticleContent(finalContent)) {
       setError("请输入文章内容")
       return
     }
@@ -144,7 +149,7 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
         body: JSON.stringify({
           title,
           summary,
-          content,
+          content: finalContent,
           coverImage,
           published,
           pinned,
@@ -284,6 +289,7 @@ export default function ArticleForm({ initialData, collections }: ArticleFormPro
 
       {/* Editor */}
       <RichTextEditor
+        ref={editorRef}
         content={content}
         onChange={(json) => setContent(json)}
       />
