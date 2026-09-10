@@ -60,6 +60,7 @@ type SectionKey =
   | "hobbies"
   | "education"
   | "campus"
+  | "internships"
   | "competitions"
   | "projects"
   | "practices"
@@ -74,6 +75,7 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   hobbies: "兴趣爱好",
   education: "教育经历",
   campus: "校园经历",
+  internships: "实习经历",
   competitions: "竞赛经历",
   projects: "项目经历",
   practices: "实践经历",
@@ -137,6 +139,9 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
 
   const [education, setEducation] = useState<ExperienceItem[]>(expInit("education"))
   const [campus, setCampus] = useState<ExperienceItem[]>(expInit("campus"))
+  const [internships, setInternships] = useState<ExperienceItem[]>(
+    expInit("internship")
+  )
   const [competitions, setCompetitions] = useState<ExperienceItem[]>(
     expInit("competition")
   )
@@ -152,6 +157,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     hobbies: false,
     education: false,
     campus: false,
+    internships: false,
     competitions: false,
     projects: false,
     practices: false,
@@ -201,6 +207,11 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
       ...certificates.map((item, i) => ({ ...item, type: "certificate", sortOrder: i })),
       ...education.map((item, i) => ({ ...item, type: "education", sortOrder: i })),
       ...campus.map((item, i) => ({ ...item, type: "campus", sortOrder: i })),
+      ...internships.map((item, i) => ({
+        ...item,
+        type: "internship",
+        sortOrder: i,
+      })),
       ...competitions.map((item, i) => ({
         ...item,
         type: "competition",
@@ -627,6 +638,26 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
             { key: "description", label: "描述", placeholder: "工作内容..." },
           ]}
           emptyLabel="添加校园经历"
+          textareaKeys={["description"]}
+        />
+      )}
+
+      {/* Internships */}
+      <SectionHeader section="internships" />
+      {expanded.internships && (
+        <DynamicList
+          items={internships}
+          onChange={setInternships}
+          fields={[
+            { key: "title", label: "公司/组织", placeholder: "XX科技有限公司" },
+            { key: "subtitle", label: "职位", placeholder: "后端开发实习生" },
+            { key: "startDate", label: "开始", placeholder: "2026.09" },
+            { key: "endDate", label: "结束", placeholder: "至今" },
+            { key: "description", label: "工作内容", placeholder: "项目与职责..." },
+            { key: "techStack", label: "技术栈", placeholder: "Python, FastAPI, ..." },
+            { key: "image", label: "证明材料图片", placeholder: "/certificates/xxx.jpg（可选）" },
+          ]}
+          emptyLabel="添加实习经历"
           textareaKeys={["description"]}
         />
       )}

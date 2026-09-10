@@ -6,12 +6,35 @@ export default function RightColumn({
 }: {
   experiences: ResumeExperienceData[]
 }) {
+  const internships = experiences.filter((e) => e.type === "internship")
   const competitions = experiences.filter((e) => e.type === "competition")
   const projects = experiences.filter((e) => e.type === "project")
   const practices = experiences.filter((e) => e.type === "practice")
 
   return (
     <div className="lg:col-span-2 space-y-10">
+      {/* Internships */}
+      {internships.length > 0 && (
+        <section className="space-y-4">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+            实习经历
+          </h3>
+          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
+            {internships.map((item) => (
+              <TimelineItem
+                key={item.id ?? item.title}
+                title={item.title}
+                subtitle={item.subtitle || undefined}
+                date={formatDateRange(item.startDate, item.endDate)}
+                description={item.description || ""}
+                tech={item.techStack || undefined}
+                image={item.image || undefined}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Competitions */}
       {competitions.length > 0 && (
         <section className="space-y-4">
@@ -77,11 +100,14 @@ export default function RightColumn({
       )}
 
       {/* 空状态：右栏没有内容时提示 */}
-      {competitions.length === 0 && projects.length === 0 && practices.length === 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-          <p className="text-lg">暂无竞赛、项目与实践经历</p>
-        </div>
-      )}
+      {internships.length === 0 &&
+        competitions.length === 0 &&
+        projects.length === 0 &&
+        practices.length === 0 && (
+          <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+            <p className="text-lg">暂无实习、竞赛、项目与实践经历</p>
+          </div>
+        )}
     </div>
   )
 }
