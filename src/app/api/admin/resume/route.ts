@@ -56,6 +56,20 @@ export async function PUT(req: NextRequest) {
       }
     }
 
+    // 安全校验：证明材料图片必须是站内相对路径（防止 javascript:/外链注入）
+    const imagePaths = Array.isArray(experiences)
+      ? experiences.map((e: any) => e?.image).filter(Boolean)
+      : []
+    const invalidImage = imagePaths.find(
+      (p: string) => typeof p !== "string" || !/^\/[A-Za-z0-9._\-\/]+$/.test(p)
+    )
+    if (invalidImage) {
+      return NextResponse.json(
+        { error: "证明材料图片路径无效，需为站内路径（如 /certificates/xxx.jpg）" },
+        { status: 400 }
+      )
+    }
+
     // Use transaction for atomicity
     const result = await prisma.$transaction(async (tx) => {
       // Find or create profile
@@ -120,6 +134,7 @@ export async function PUT(req: NextRequest) {
               endDate: e.endDate || null,
               description: e.description || null,
               techStack: e.techStack || null,
+              image: e.image || null,
               sortOrder: e.sortOrder ?? i,
               profileId: profile!.id,
             })),

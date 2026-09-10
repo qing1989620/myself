@@ -16,6 +16,8 @@ export interface ResumeExperienceData {
   endDate?: string | null
   description?: string | null
   techStack?: string | null
+  /** 证明材料图片路径，如 /certificates/xxx.jpg（可选） */
+  image?: string | null
   sortOrder: number
 }
 
@@ -94,6 +96,7 @@ export async function getResumeData(): Promise<ResumeFullData> {
       endDate: e.endDate,
       description: e.description,
       techStack: e.techStack,
+      image: e.image,
       sortOrder: e.sortOrder,
     })),
   }

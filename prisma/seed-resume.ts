@@ -88,16 +88,18 @@ const experiences = [
     description:
       "主修课程：高等数学、线性代数、C 语言、Java、Python、机器学习与深度学习、数据结构、计算机组成原理、操作系统、计算机网络原理、大数据技术基础、自然语言处理",
     techStack: null,
+    image: null,
   },
   {
     type: "competition",
     title: "睿抗机器人开发者大赛（RAICOM）全国一等奖",
-    subtitle: "CAIP 强脑赛道 · 智海算法调优赛题",
+    subtitle: "CAIP 强脑赛道 · 智海算法调优竞赛项目",
     startDate: "2026.04",
     endDate: "2026.08",
     description:
-      "由工业和信息化部人才交流中心主办，连续多年入选《全国普通高校大学生竞赛排行榜》的 A 类赛事。赛题要求对复杂气象场景下的多类别图像做智能分类，并在有限算力约束下完成数据清洗、网络重构、模型轻量化与精度—速度平衡等工程化调优，全程依托浙江大学智海 Mo 平台（momodel.cn）线上开发与自动评测。",
+      "由工业和信息化部人才交流中心主办，连续多年入选《全国普通高校大学生竞赛排行榜》的 A 类赛事。全国总决赛「智海算法调优竞赛项目」要求对复杂气象场景下的多类别图像做智能分类，并在有限算力约束下完成数据清洗、网络重构、模型轻量化与精度—速度平衡等工程化调优，依托浙江大学智海 Mo 平台（momodel.cn）线上开发与自动评测。\n参赛队伍：陈勇搏、蒋喆、陈威霖 ｜ 指导老师：张超龙 ｜ 证书编号：IITCHJRAIC26011368（2026.08.03 颁发）",
     techStack: "Python · PyTorch · 计算机视觉 · 模型轻量化 · 智海 Mo 平台",
+    image: "/certificates/raicom-2026-national-first-prize.jpg",
   },
   {
     type: "competition",
@@ -106,8 +108,9 @@ const experiences = [
     startDate: "2025.09",
     endDate: "2025.12",
     description:
-      "以数据要素开发应用与企业真实场景命题，考察数据处理、分析挖掘与实战决策能力。团队作品 FruitScope「果境数鉴」围绕果园生产数据搭建风险监测—诊断—推演—防控的闭环决策工作台，融合气象、土壤、病虫害等多源数据输出风险预警与防控建议；独立完成系统开发并部署上线，支持账号登录与决策任务流转。",
+      "以数据要素开发应用与企业真实场景命题，考察数据处理、分析挖掘与实战决策能力。作品 FruitScope「果境数鉴」围绕果园生产数据搭建风险监测—诊断—推演—防控的闭环决策工作台，融合气象、土壤、病虫害等多源数据输出风险预警与防控建议；独立完成系统开发并部署上线，支持账号登录与决策任务流转。",
     techStack: "多源数据融合 · 风险预警建模 · Web 全栈 · 云服务器部署",
+    image: null,
   },
   {
     type: "competition",
@@ -116,8 +119,9 @@ const experiences = [
     startDate: "2025.06",
     endDate: "2025.12",
     description:
-      "赛题源自新材料晶体结构解析的真实需求：粉末 XRD 指标化是结构解析的第一步，需将衍射峰序列转化为晶面指数并反推晶胞参数。数据集由 Crystallography Open Database 真实数据模拟生成，叠加零点漂移、样品偏移等系统性误差与随机噪声，并随机插入无标注杂质峰。要求在强干扰下同时优化晶胞参数回归精度（RMSE）与晶面指数匹配率（Accuracy）。",
+      "赛题源自新材料晶体结构解析的真实需求：粉末 XRD 指标化是结构解析的第一步，需将衍射峰序列转化为晶面指数并反推晶胞参数。数据集由 Crystallography Open Database 真实数据模拟生成，叠加零点漂移、样品偏移等系统性误差与随机噪声，并随机插入无标注杂质峰。要求在强干扰下同时优化晶胞参数回归精度（RMSE）与晶面指数匹配率（Accuracy）。\n参赛队伍：陈达沛、陈勇搏、陈颖超 ｜ 指导教师：徐雪松、宋明月 ｜ 证书编号：2025-AIC-GM265D5PR（2025.12 颁发）",
     techStack: "Python · PyTorch · XRD 衍射信号处理 · 回归 + 分类多任务学习 · 鲁棒特征提取",
+    image: "/certificates/aic-7th-challenge-second-prize.jpg",
   },
   {
     type: "competition",
@@ -128,26 +132,29 @@ const experiences = [
     description:
       "基于 1000 例多源异构样本（中医九种体质积分、ADL/IADL 活动能力量表、血常规与代谢指标），完成三步建模：筛选表征痰湿严重度与高血脂风险的关键指标并量化九种体质的贡献度；构建低/中/高三级风险预警模型并给出可解释的分层阈值；在总成本不超过 2000 元、6 个月的约束下，为痰湿体质患者求解个性化干预方案。",
     techStack: "Python · LASSO / 随机森林 / Logistic 回归 · SHAP 可解释性 · 整数规划与动态规划",
+    image: null,
   },
   {
     type: "competition",
-    title: "启智杯机器智能大赛 全国三等奖",
-    subtitle: "第四届 · 算法赛道：纤量智检——工业小样本缺陷检测算法",
+    title: "启智杯机器智能大赛 算法赛道三等奖",
+    subtitle: "2026 年度第四届 · 命题：纤量智检——工业小样本缺陷检测算法",
     startDate: "2025.10",
     endDate: "2026.05",
     description:
-      "由浙江、江苏、上海、安徽四省市仪器仪表学会联合主办，海康机器人与中国计量大学承办，本届覆盖全国 204 所院校、1206 支团队，仅 36 支晋级全国总决赛。算法赛道聚焦工业小样本印刷缺陷检测，要求在动态换型、标注样本极少（甚至仅依赖正常样本）的条件下实现多类别多形态缺陷的快速精准检测，决赛现场需完成数据采集、清洗、调参、验证与模型部署全流程。",
+      "由浙江、江苏、上海、安徽四省市仪器仪表学会联合主办，海康机器人与中国计量大学承办，本届覆盖全国 204 所院校、1206 支团队，仅 36 支晋级全国总决赛。算法赛道聚焦工业小样本印刷缺陷检测，要求在动态换型、标注样本极少（甚至仅依赖正常样本）的条件下实现多类别多形态缺陷的快速精准检测，决赛现场需完成数据采集、清洗、调参、验证与模型部署全流程。\n参赛队伍：DL_cyh（陈勇搏、杨雅玉、何怡静）｜ 指导老师：刘振坤、赵海裕 ｜ 2026.05.24 颁发",
     techStack: "Python · 深度学习 · 小样本缺陷检测 · 异常检测 · 海康 VM 生态",
+    image: "/certificates/qizhibei-4th-algorithm-third-prize.jpg",
   },
   {
     type: "competition",
     title: "中国机器人及人工智能大赛 全国三等奖",
-    subtitle: "微型无人机赛项",
-    startDate: "",
+    subtitle: "第二十八届 · 机器人任务挑战赛（微型无人机）",
+    startDate: "2026.07",
     endDate: "",
     description:
-      "在微型无人机赛项中完成飞控调试与任务流程实现；同期另获省级、校级竞赛奖项若干。",
+      "在第二十八届中国机器人及人工智能大赛全国总决赛中，于机器人任务挑战赛（微型无人机）赛项完成飞控调试与任务流程实现，获全国三等奖；同期另获省级、校级竞赛奖项若干。\n参赛队伍：李亦浛、陈威霖、陈勇搏 ｜ 指导老师：郁军伟、陈欢 ｜ 证书编号：CRAIC2026-NF-W3HESE（2026.07 颁发）",
     techStack: "嵌入式调试 · 无人机飞控 · 任务规划",
+    image: "/certificates/craic-28th-micro-uav-third-prize.png",
   },
   {
     type: "project",
@@ -159,6 +166,7 @@ const experiences = [
       "独立负责后端架构与全模块开发（FastAPI + SQLAlchemy + PostgreSQL + Redis）：构建“上传解析→分段→BGE 向量化→Chroma 检索”RAG 管线，SSE 流式问答并附引用溯源；实现 AI 出题判分、苏格拉底式辅导与学习报告；对接 TCN 知识追踪引擎与 LEKT 先修矩阵，输出知识图谱与个性化学习路径；集成内嵌 Agent 框架（工具调用 / MCP）与多 Key 池 LLM 网关。基于 vLLM 在 RTX 6000 上部署 Qwen3-32B（AWQ INT4 量化），提供 OpenAI 兼容接口，数据全私有化。",
     techStack:
       "FastAPI · SQLAlchemy · PostgreSQL · Redis · Chroma · BGE · SSE · vLLM · Qwen3-32B（AWQ INT4） · MCP",
+    image: null,
   },
   {
     type: "practice",
@@ -169,15 +177,17 @@ const experiences = [
     description:
       "依托 itag 平台开展图片轨迹指令匹配与轨迹点标注，严格遵循标注规范与样本废弃判定标准。累计完成 8000+ 张图片标注，指令匹配准确率达 90%，单图平均标注时长 25 秒，样本废弃率控制在 5% 以内。",
     techStack: null,
+    image: null,
   },
   {
     type: "certificate",
-    title: "海康机器人机器视觉开发工程师证书",
+    title: "海康机器人 机器视觉开发工程师认证（2D 视觉 · HCA），有效期至 2028.05",
     subtitle: null,
     startDate: null,
     endDate: null,
     description: null,
     techStack: null,
+    image: "/certificates/hikrobot-machine-vision-engineer.png",
   },
   {
     type: "certificate",
@@ -187,6 +197,7 @@ const experiences = [
     endDate: null,
     description: null,
     techStack: null,
+    image: null,
   },
   {
     type: "certificate",
@@ -196,6 +207,7 @@ const experiences = [
     endDate: null,
     description: null,
     techStack: null,
+    image: null,
   },
 ]
 

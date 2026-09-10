@@ -27,6 +27,7 @@ export default function RightColumn({
                 date={formatDateRange(item.startDate, item.endDate)}
                 description={item.description || ""}
                 tech={item.techStack || undefined}
+                image={item.image || undefined}
               />
             ))}
           </div>
@@ -97,12 +98,14 @@ function TimelineItem({
   date,
   description,
   tech,
+  image,
 }: {
   title: string
   subtitle?: string
   date: string
   description: string
   tech?: string
+  image?: string
 }) {
   return (
     <div className="relative pl-4 border-l-2 border-gray-100">
@@ -126,6 +129,27 @@ function TimelineItem({
         <p className="text-xs text-gray-400 mt-1.5 font-mono">
           <AutoLink text={tech} />
         </p>
+      )}
+      {/* 证明材料：点击可看大图 */}
+      {image && (
+        <a
+          href={image}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-block mt-3"
+          title="点击查看证书原图"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image}
+            alt={`${title} 证明材料`}
+            loading="lazy"
+            className="max-h-44 w-auto rounded-lg border border-gray-200 shadow-sm group-hover:border-accent group-hover:shadow-md transition-all"
+          />
+          <span className="block mt-1 text-xs text-gray-400 group-hover:text-accent transition-colors">
+            查看证书原件
+          </span>
+        </a>
       )}
     </div>
   )

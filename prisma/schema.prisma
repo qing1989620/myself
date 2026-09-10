@@ -156,6 +156,7 @@ model ResumeExperience {
   endDate     String?
   description String?
   techStack   String?
+  image       String?
   sortOrder   Int           @default(0)
   profileId   Int
   profile     ResumeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)

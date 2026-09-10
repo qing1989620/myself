@@ -54,3 +54,6 @@ data/uploads/
 
 # agent workspace notes (可能含密钥、密码等私密信息，禁止提交)
 .workbuddy/
+
+# 原始素材文件夹（已整理进 public/certificates，无需重复入库）
+资料补充/

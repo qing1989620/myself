@@ -98,10 +98,32 @@ export default function LeftColumn({ profile, skills, experiences }: LeftColumnP
         <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
           证书
         </h3>
-        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-2 text-sm text-gray-600">
+        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3 text-sm text-gray-600">
           {certificates.length > 0 ? (
             certificates.map((cert) => (
-              <p key={cert.id ?? cert.title}>• {cert.title}</p>
+              <div key={cert.id ?? cert.title} className="space-y-2">
+                <p>• {cert.title}</p>
+                {cert.image && (
+                  <a
+                    href={cert.image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block"
+                    title="点击查看证书原图"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={cert.image}
+                      alt={`${cert.title} 证明材料`}
+                      loading="lazy"
+                      className="w-full rounded-lg border border-gray-200 shadow-sm group-hover:border-accent group-hover:shadow-md transition-all"
+                    />
+                    <span className="block mt-1 text-xs text-gray-400 group-hover:text-accent transition-colors">
+                      查看证书原件
+                    </span>
+                  </a>
+                )}
+              </div>
             ))
           ) : (
             <p className="text-gray-400">暂无证书信息</p>

@@ -19,6 +19,7 @@ interface ExperienceItem {
   endDate?: string | null
   description?: string | null
   techStack?: string | null
+  image?: string | null
 }
 
 interface ProfileData {
@@ -116,6 +117,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
         endDate: e.endDate || "",
         description: e.description || "",
         techStack: e.techStack || "",
+        image: e.image || "",
       })) || []
   )
 
@@ -130,6 +132,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
         endDate: e.endDate || "",
         description: e.description || "",
         techStack: e.techStack || "",
+        image: e.image || "",
       })) || []
 
   const [education, setEducation] = useState<ExperienceItem[]>(expInit("education"))
@@ -556,7 +559,10 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
         <DynamicList
           items={certificates}
           onChange={setCertificates}
-          fields={[{ key: "title", label: "证书名称", placeholder: "CET-6" }]}
+          fields={[
+            { key: "title", label: "证书名称", placeholder: "CET-6" },
+            { key: "image", label: "证明材料图片", placeholder: "/certificates/xxx.jpg（可选）" },
+          ]}
           emptyLabel="添加证书"
         />
       )}
@@ -638,6 +644,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
             { key: "endDate", label: "结束", placeholder: "2025.08" },
             { key: "description", label: "赛题与工作内容", placeholder: "赛题背景、你的方案与产出..." },
             { key: "techStack", label: "技术栈", placeholder: "Python, PyTorch, ..." },
+            { key: "image", label: "证明材料图片", placeholder: "/certificates/xxx.jpg（可选）" },
           ]}
           emptyLabel="添加竞赛经历"
           textareaKeys={["description"]}
