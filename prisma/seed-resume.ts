@@ -303,7 +303,17 @@ const experiences = [
   },
   {
     type: "certificate",
-    title: "大学英语四级 / 六级（CET-4/6），具备良好的听说读写能力",
+    title: "大学英语六级（CET-6）总分 447 — 听力 148 / 阅读 172 / 写作与翻译 127（2025.12）",
+    subtitle: null,
+    startDate: null,
+    endDate: null,
+    description: null,
+    techStack: null,
+    image: "/certificates/cet6-score-report-2025-12.jpg",
+  },
+  {
+    type: "certificate",
+    title: "大学英语四级（CET-4），具备良好的英语听说读写与专业文献阅读能力",
     subtitle: null,
     startDate: null,
     endDate: null,
