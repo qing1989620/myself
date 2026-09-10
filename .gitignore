@@ -30,9 +30,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files —— .env 一并入库，保证在新服务器可直接复现（注意：其中的 AUTH_SECRET 已公开，
+# 部署到服务器时请重新生成：openssl rand -base64 32）
 .env*
 !.env.example
+!.env
 
 # vercel
 .vercel
@@ -43,17 +45,17 @@ next-env.d.ts
 
 /src/generated/prisma
 
-# sqlite
+# sqlite —— dev.db 入库以保证数据可复现；备份文件不入库
 *.db
+!dev.db
 dev.db.bak.*
 uploads.bak.*.tar.gz
 
-# user uploads
+# user uploads —— 编辑器上传的图片与简历 PDF 需要随仓库部署，故一并入库
 public/images/uploads/
-data/uploads/
 
 # agent workspace notes (可能含密钥、密码等私密信息，禁止提交)
 .workbuddy/
 
-# 原始素材文件夹（已整理进 public/certificates，无需重复入库）
-资料补充/
+# 私有文件（含身份证号等敏感信息的原件，绝不入库）
+.private/
