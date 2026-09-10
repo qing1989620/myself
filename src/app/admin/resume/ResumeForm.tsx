@@ -59,6 +59,7 @@ type SectionKey =
   | "hobbies"
   | "education"
   | "campus"
+  | "competitions"
   | "projects"
   | "practices"
   | "footer"
@@ -72,6 +73,7 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   hobbies: "兴趣爱好",
   education: "教育经历",
   campus: "校园经历",
+  competitions: "竞赛经历",
   projects: "项目经历",
   practices: "实践经历",
   footer: "求职意向",
@@ -132,6 +134,9 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
 
   const [education, setEducation] = useState<ExperienceItem[]>(expInit("education"))
   const [campus, setCampus] = useState<ExperienceItem[]>(expInit("campus"))
+  const [competitions, setCompetitions] = useState<ExperienceItem[]>(
+    expInit("competition")
+  )
   const [projects, setProjects] = useState<ExperienceItem[]>(expInit("project"))
   const [practices, setPractices] = useState<ExperienceItem[]>(expInit("practice"))
 
@@ -144,6 +149,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     hobbies: false,
     education: false,
     campus: false,
+    competitions: false,
     projects: false,
     practices: false,
     footer: false,
@@ -192,6 +198,11 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
       ...certificates.map((item, i) => ({ ...item, type: "certificate", sortOrder: i })),
       ...education.map((item, i) => ({ ...item, type: "education", sortOrder: i })),
       ...campus.map((item, i) => ({ ...item, type: "campus", sortOrder: i })),
+      ...competitions.map((item, i) => ({
+        ...item,
+        type: "competition",
+        sortOrder: i,
+      })),
       ...projects.map((item, i) => ({ ...item, type: "project", sortOrder: i })),
       ...practices.map((item, i) => ({ ...item, type: "practice", sortOrder: i })),
     ]
@@ -610,6 +621,25 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
             { key: "description", label: "描述", placeholder: "工作内容..." },
           ]}
           emptyLabel="添加校园经历"
+          textareaKeys={["description"]}
+        />
+      )}
+
+      {/* Competitions */}
+      <SectionHeader section="competitions" />
+      {expanded.competitions && (
+        <DynamicList
+          items={competitions}
+          onChange={setCompetitions}
+          fields={[
+            { key: "title", label: "竞赛名称/奖项", placeholder: "XX 大赛 全国一等奖" },
+            { key: "subtitle", label: "赛道/赛题", placeholder: "算法赛道 · XX 赛题" },
+            { key: "startDate", label: "开始", placeholder: "2025.04" },
+            { key: "endDate", label: "结束", placeholder: "2025.08" },
+            { key: "description", label: "赛题与工作内容", placeholder: "赛题背景、你的方案与产出..." },
+            { key: "techStack", label: "技术栈", placeholder: "Python, PyTorch, ..." },
+          ]}
+          emptyLabel="添加竞赛经历"
           textareaKeys={["description"]}
         />
       )}
