@@ -62,6 +62,7 @@ type SectionKey =
   | "campus"
   | "internships"
   | "competitions"
+  | "majorProjects"
   | "projects"
   | "practices"
   | "footer"
@@ -77,7 +78,8 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   campus: "校园经历",
   internships: "实习经历",
   competitions: "竞赛经历",
-  projects: "项目经历",
+  majorProjects: "核心项目",
+  projects: "开源项目",
   practices: "实践经历",
   footer: "求职意向",
 }
@@ -146,6 +148,9 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     expInit("competition")
   )
   const [projects, setProjects] = useState<ExperienceItem[]>(expInit("project"))
+  const [majorProjects, setMajorProjects] = useState<ExperienceItem[]>(
+    expInit("majorProject")
+  )
   const [practices, setPractices] = useState<ExperienceItem[]>(expInit("practice"))
 
   const [expanded, setExpanded] = useState<Record<SectionKey, boolean>>({
@@ -159,6 +164,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
     campus: false,
     internships: false,
     competitions: false,
+    majorProjects: false,
     projects: false,
     practices: false,
     footer: false,
@@ -215,6 +221,11 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
       ...competitions.map((item, i) => ({
         ...item,
         type: "competition",
+        sortOrder: i,
+      })),
+      ...majorProjects.map((item, i) => ({
+        ...item,
+        type: "majorProject",
         sortOrder: i,
       })),
       ...projects.map((item, i) => ({ ...item, type: "project", sortOrder: i })),
@@ -678,6 +689,26 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
             { key: "image", label: "证明材料图片", placeholder: "/certificates/xxx.jpg（可选）" },
           ]}
           emptyLabel="添加竞赛经历"
+          textareaKeys={["description"]}
+        />
+      )}
+
+      {/* 核心项目 */}
+      <SectionHeader section="majorProjects" />
+      {expanded.majorProjects && (
+        <DynamicList
+          items={majorProjects}
+          onChange={setMajorProjects}
+          fields={[
+            { key: "title", label: "项目名称", placeholder: "XX 系统" },
+            { key: "subtitle", label: "角色/说明", placeholder: "后端技术开发 · 独立负责" },
+            { key: "startDate", label: "开始", placeholder: "2025.04" },
+            { key: "endDate", label: "结束", placeholder: "至今" },
+            { key: "description", label: "项目描述", placeholder: "背景、你的工作与技术方案..." },
+            { key: "techStack", label: "技术栈", placeholder: "FastAPI, PostgreSQL, ..." },
+            { key: "image", label: "证明材料图片", placeholder: "/certificates/xxx.jpg（可选）" },
+          ]}
+          emptyLabel="添加核心项目"
           textareaKeys={["description"]}
         />
       )}

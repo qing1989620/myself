@@ -7,6 +7,7 @@ export default function RightColumn({
   experiences: ResumeExperienceData[]
 }) {
   const internships = experiences.filter((e) => e.type === "internship")
+  const majorProjects = experiences.filter((e) => e.type === "majorProject")
   const competitions = experiences.filter((e) => e.type === "competition")
   const projects = experiences.filter((e) => e.type === "project")
   const practices = experiences.filter((e) => e.type === "practice")
@@ -21,6 +22,28 @@ export default function RightColumn({
           </h3>
           <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
             {internships.map((item) => (
+              <TimelineItem
+                key={item.id ?? item.title}
+                title={item.title}
+                subtitle={item.subtitle || undefined}
+                date={formatDateRange(item.startDate, item.endDate)}
+                description={item.description || ""}
+                tech={item.techStack || undefined}
+                image={item.image || undefined}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 核心项目（重点项目单独成栏，置于显要位置） */}
+      {majorProjects.length > 0 && (
+        <section className="space-y-4">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+            核心项目
+          </h3>
+          <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
+            {majorProjects.map((item) => (
               <TimelineItem
                 key={item.id ?? item.title}
                 title={item.title}
@@ -61,7 +84,7 @@ export default function RightColumn({
       {projects.length > 0 && (
         <section className="space-y-4">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-            项目经历
+            开源项目
           </h3>
           <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
             {projects.map((item) => (
@@ -101,11 +124,12 @@ export default function RightColumn({
 
       {/* 空状态：右栏没有内容时提示 */}
       {internships.length === 0 &&
+        majorProjects.length === 0 &&
         competitions.length === 0 &&
         projects.length === 0 &&
         practices.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-            <p className="text-lg">暂无实习、竞赛、项目与实践经历</p>
+            <p className="text-lg">暂无实习、项目、竞赛与实践经历</p>
           </div>
         )}
     </div>

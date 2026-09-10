@@ -62,7 +62,7 @@ const profileData = {
   degree: "本科",
   political: "共青团员",
   selfEvaluation:
-    "技术复合型开发者，深耕 Python 后端与 AI 应用：具备从 RESTful API、RAG 检索管线到 LLM 智能体集成、本地大模型私有化部署的完整经验，并独立开源 OMMW 数学建模工作流、paper-skill 论文工程引擎、AI 编程工程工作流三个 MIT 协议项目。累计获国家级 AI、机器人、数学建模与数据类竞赛奖项 6 项（含全国一等奖 2 项），兼具严密的算法逻辑与较强的工程落地能力，致力于用精简高效的架构解决复杂业务问题。\nGitHub：https://github.com/qing1989620",
+    "技术复合型开发者，深耕 Python 后端与 AI 应用：独立负责「知序（zhixu）」学习知识归纳与规划系统的后端架构与全模块开发（RAG 检索管线、知识追踪与个性化学习路径、本地大模型私有化部署），并开源 OMMW 数学建模工作流、paper-skill 论文工程引擎、AI 编程工程工作流三个 MIT 协议项目。累计获国家级 AI、机器人、数学建模与数据类竞赛奖项 6 项（含全国一等奖 2 项），兼具严密的算法逻辑与较强的工程落地能力，致力于用精简高效的架构解决复杂业务问题。\nGitHub：https://github.com/qing1989620",
   jobTarget: "Python 后端开发 / AI 智能体应用（实习或校招）",
   jobSummary: "",
   hobbies: "",
@@ -214,13 +214,13 @@ const experiences = [
     image: null,
   },
   {
-    type: "project",
+    type: "majorProject",
     title: "“知序（zhixu）”学习知识归纳与规划系统",
-    subtitle: "后端技术开发（独立负责后端架构与全模块）",
+    subtitle: "后端技术开发 · 独立负责后端架构与全模块（闭源产品）",
     startDate: "2025.04",
-    endDate: "2025.10",
+    endDate: "至今",
     description:
-      "独立负责后端架构与全模块开发（FastAPI + SQLAlchemy + PostgreSQL + Redis）：构建“上传解析→分段→BGE 向量化→Chroma 检索”RAG 管线，SSE 流式问答并附引用溯源；实现 AI 出题判分、苏格拉底式辅导与学习报告；对接 TCN 知识追踪引擎与 LEKT 先修矩阵，输出知识图谱与个性化学习路径；集成内嵌 Agent 框架（工具调用 / MCP）与多 Key 池 LLM 网关。基于 vLLM 在 RTX 6000 上部署 Qwen3-32B（AWQ INT4 量化），提供 OpenAI 兼容接口，数据全私有化。",
+      "面向学习场景的知识归纳与规划系统，承担后端技术选型与全模块开发。构建“上传解析→分段→BGE 向量化→Chroma 检索”的 RAG 管线，SSE 流式问答并附引用溯源；实现 AI 出题判分、苏格拉底式辅导与学习报告；对接 TCN 知识追踪引擎与 LEKT 先修矩阵，输出知识图谱与个性化学习路径；集成内嵌 Agent 框架（工具调用 / MCP）与多 Key 池 LLM 网关。基于 vLLM 在 RTX 6000 上部署 Qwen3-32B（AWQ INT4 量化），提供 OpenAI 兼容接口，实现数据全私有化。\n该项目为闭源产品，代码未公开。",
     techStack:
       "FastAPI · SQLAlchemy · PostgreSQL · Redis · Chroma · BGE · SSE · vLLM · Qwen3-32B（AWQ INT4） · MCP",
     image: null,
