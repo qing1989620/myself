@@ -7,7 +7,7 @@ import { PHOTO_CATEGORIES, HOBBY_ICONS } from "@/lib/photo-categories"
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
-  title: "生活相册 | QingHub",
+  title: "生活相册",
 }
 
 export default async function PhotosPage() {
