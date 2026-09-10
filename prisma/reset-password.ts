@@ -31,7 +31,7 @@ function ask(question: string): Promise<string> {
 }
 
 async function main() {
-  console.log("=== lankHub 重置站长密码 ===\n")
+  console.log("=== QingHub 重置站长密码 ===\n")
 
   // 查找站长账号（默认邮箱 admin@lankhub.com）
   const owner = await prisma.user.findFirst({

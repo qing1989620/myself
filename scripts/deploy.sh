@@ -1,13 +1,13 @@
 #!/bin/bash
 # ============================================
-# lankHub WSL 本地构建 + 部署到服务器
+# QingHub WSL 本地构建 + 部署到服务器
 # 在 WSL 中运行：bash scripts/deploy.sh
 # ============================================
 set -e
 
 # === 配置：修改为你的服务器信息 ===
 SERVER="root@你的服务器IP"
-REMOTE_DIR="/root/lankhub"
+REMOTE_DIR="/root/qinghub"
 
 echo "📦 拉取最新代码..."
 git pull

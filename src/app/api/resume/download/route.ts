@@ -19,9 +19,9 @@ export async function GET() {
 
     // HTTP 头只能是 latin1（ByteString），中文姓名会直接抛错。
     // 因此：ASCII 回退名 + RFC 5987 filename* 提供中文原名。
-    const rawName = profile.name?.trim() || "lankhub"
+    const rawName = profile.name?.trim() || "qinghub"
     const asciiName = rawName.replace(/[^\x20-\x7E]/g, "").replace(/["\\]/g, "").trim()
-    const fallbackName = `resume-${asciiName || "lankhub"}.pdf`
+    const fallbackName = `resume-${asciiName || "qinghub"}.pdf`
     const utf8Name = encodeURIComponent(`简历-${rawName}.pdf`)
 
     return new NextResponse(buffer, {

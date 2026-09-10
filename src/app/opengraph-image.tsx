@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
-export const alt = "lankHub — 个人博客"
+export const alt = "QingHub — 个人博客"
 
 /** 动态生成社交分享卡片（微信/QQ/Twitter 等分享时展示） */
 export default function OpengraphImage() {
@@ -54,7 +54,7 @@ export default function OpengraphImage() {
           }}
         >
           <span style={{ fontSize: 88, fontWeight: 900, letterSpacing: 2 }}>
-            lankHub
+            QingHub
           </span>
         </div>
         <div

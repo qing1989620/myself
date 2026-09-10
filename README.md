@@ -1,4 +1,4 @@
-# lankHub — 个人博客
+# QingHub — 个人博客
 
 基于 Next.js 16 全栈框架的个人博客，黑白水墨极简风格，支持文章管理、合集分类、评论互动、在线简历编辑。
 
@@ -24,8 +24,8 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/LanKnight/lankhub.git
-cd lankhub
+git clone https://github.com/qing1989620/myself.git
+cd myself
 
 # 2. 配置环境变量
 cp .env.example .env
@@ -95,8 +95,8 @@ npm run dev
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/LanKnight/lankhub.git
-cd lankhub
+git clone https://github.com/qing1989620/myself.git
+cd myself
 ```
 
 ### 2. 配置环境变量
@@ -138,7 +138,7 @@ pm2 startup
 ### 5. Nginx 反向代理
 
 ```bash
-sudo nano /etc/nginx/sites-available/lankhub
+sudo nano /etc/nginx/sites-available/qinghub
 ```
 
 ```nginx
@@ -164,7 +164,7 @@ server {
 
 ```bash
 # 启用站点
-sudo ln -s /etc/nginx/sites-available/lankhub /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/qinghub /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -221,12 +221,12 @@ npm run update              # 一键更新：拉取 → 安装 → 推送DB → 
 |------|------|------|
 | `DATABASE_URL` | SQLite 数据库路径 | `file:./dev.db` |
 | `AUTH_SECRET` | JWT 加密密钥 | `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | 网站域名（Auth.js 用） | `https://lankhub.com` |
-| `NEXT_PUBLIC_SITE_URL` | 公开网站 URL（sitemap/robots） | `https://lankhub.com` |
+| `NEXTAUTH_URL` | 网站域名（Auth.js 用） | `https://qinghub.com` |
+| `NEXT_PUBLIC_SITE_URL` | 公开网站 URL（sitemap/robots） | `https://qinghub.com` |
 
 ## 管理员账号
 
-- 邮箱: `admin@lankhub.com`（可通过 `SEED_ADMIN_EMAIL` 环境变量自定义）
+- 邮箱: `admin@qinghub.com`（可通过 `SEED_ADMIN_EMAIL` 环境变量自定义）
 - 初始密码由 `prisma/seed.ts` 随机生成并仅打印一次，也可通过 `npm run reset-password` 修改
 
 > ⚠️ 部署到服务器后请立即修改 `.env` 中的密钥，并更改管理员密码。
@@ -234,7 +234,7 @@ npm run update              # 一键更新：拉取 → 安装 → 推送DB → 
 ## 目录结构
 
 ```
-lankhub/
+myself/
 ├── prisma/               # Schema + Seed
 ├── scripts/              # 部署脚本
 ├── src/

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ============================================
-# lankHub 服务器初始化脚本
+# QingHub 服务器初始化脚本
 # 用法：bash scripts/setup.sh
 # ============================================
 set -e
 
 echo "==========================================="
-echo "  lankHub 服务器部署初始化"
+echo "  QingHub 服务器部署初始化"
 echo "==========================================="
 echo ""
 
@@ -27,7 +27,7 @@ if [ ! -f ".env" ]; then
     echo "✅ 已创建 .env 文件，请编辑并填入你的配置："
     echo "   - DATABASE_URL: SQLite 数据库路径"
     echo "   - AUTH_SECRET: 随机密钥 (openssl rand -base64 32)"
-    echo "   - NEXTAUTH_URL: 你的域名 (如 https://lankhub.com)"
+    echo "   - NEXTAUTH_URL: 你的域名 (如 https://qinghub.com)"
     echo "   - NEXT_PUBLIC_SITE_URL: 公开网站 URL"
     echo ""
     echo "   编辑完成后重新运行此脚本。"
@@ -67,7 +67,7 @@ echo "启动生产服务："
 echo "  npm start"
 echo ""
 echo "或使用 PM2 常驻后台："
-echo "  pm2 start npm --name lankhub -- start"
+echo "  pm2 start npm --name qinghub -- start"
 echo ""
 echo "首次访问前，确保："
 echo "  1. 防火墙已开放端口 (如 3000)"

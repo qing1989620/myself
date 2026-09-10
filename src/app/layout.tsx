@@ -27,10 +27,10 @@ const notoSerifSC = Noto_Serif_SC({
 
 export const metadata: Metadata = {
   title: {
-    default: "lankHub — 个人博客",
-    template: "%s | lankHub",
+    default: "QingHub — 个人博客",
+    template: "%s | QingHub",
   },
-  description: "记录成长，分享技术与生活 — lankHub 个人博客",
+  description: "记录成长，分享技术与生活 — QingHub 个人博客",
 }
 
 export default function RootLayout({

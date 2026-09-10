@@ -56,7 +56,7 @@ export default function LoginForm() {
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">欢迎回来</h1>
-        <p className="text-gray-500 mt-2">登录你的 lankHub 账号</p>
+        <p className="text-gray-500 mt-2">登录你的 QingHub 账号</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">

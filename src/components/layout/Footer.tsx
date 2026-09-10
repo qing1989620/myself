@@ -47,7 +47,7 @@ export default function Footer() {
           {/* Social */}
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/LanKnight"
+              href="https://github.com/qing1989620"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -56,7 +56,7 @@ export default function Footer() {
               <GithubIcon size={20} />
             </a>
             <a
-              href="mailto:lanknight@qq.com"
+              href="mailto:2976982852@qq.com"
               className="text-gray-400 hover:text-gray-600 transition-colors"
               aria-label="Email"
             >
@@ -68,7 +68,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-6 pt-6 border-t border-gray-100 text-center">
           <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
-            © {currentYear} lankHub · Made with
+            © {currentYear} QingHub · Made with
             <Heart size={12} className="text-red-400" />
             · 记录成长，分享生活
           </p>

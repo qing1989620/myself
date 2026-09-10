@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = getPhotoCategory(category)
   if (!cat) return { title: "未找到" }
   return {
-    title: `${cat.label} - 生活相册 | lankHub`,
+    title: `${cat.label} - 生活相册 | QingHub`,
   }
 }
 

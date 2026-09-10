@@ -32,16 +32,16 @@ async function main() {
   const owner = await prisma.user.upsert({
     where: { email: ownerEmail },
     update: {
-      name: "站长",
+      name: "Qing",
       role: "OWNER",
-      bio: "lankHub 博客站长",
+      bio: "Qing 的个人博客",
     },
     create: {
       email: ownerEmail,
       password: hashedPassword,
-      name: "站长",
+      name: "Qing",
       role: "OWNER",
-      bio: "lankHub 博客站长",
+      bio: "Qing 的个人博客",
     },
   })
 
@@ -57,12 +57,12 @@ async function main() {
     where: { slug: "getting-started" },
     update: {
       name: "入门指南",
-      description: "帮助你快速上手 lankHub 的文章合集",
+      description: "帮助你快速上手 QingHub 的文章合集",
     },
     create: {
       name: "入门指南",
       slug: "getting-started",
-      description: "帮助你快速上手 lankHub 的文章合集",
+      description: "帮助你快速上手 QingHub 的文章合集",
       sortOrder: 0,
     },
   })
@@ -71,9 +71,9 @@ async function main() {
 
   // Create a sample article
   await prisma.article.upsert({
-    where: { slug: "welcome-to-lankhub" },
+    where: { slug: "welcome-to-qinghub" },
     update: {
-      title: "欢迎来到 lankHub",
+      title: "欢迎来到 QingHub",
       summary: "这是我的第一篇博客文章，欢迎来访！",
       content: JSON.stringify({
         type: "doc",
@@ -83,7 +83,7 @@ async function main() {
             content: [
               {
                 type: "text",
-                text: "欢迎来到 lankHub！这是我的个人博客，在这里我会分享技术心得、生活感悟和各种有趣的内容。",
+                text: "欢迎来到 QingHub！这是我的个人博客，在这里我会分享技术心得、生活感悟和各种有趣的内容。",
               },
             ],
           },
@@ -93,8 +93,8 @@ async function main() {
       collectionId: collection.id,
     },
     create: {
-      title: "欢迎来到 lankHub",
-      slug: "welcome-to-lankhub",
+      title: "欢迎来到 QingHub",
+      slug: "welcome-to-qinghub",
       summary: "这是我的第一篇博客文章，欢迎来访！",
       content: JSON.stringify({
         type: "doc",
@@ -104,7 +104,7 @@ async function main() {
             content: [
               {
                 type: "text",
-                text: "欢迎来到 lankHub！这是我的个人博客，在这里我会分享技术心得、生活感悟和各种有趣的内容。",
+                text: "欢迎来到 QingHub！这是我的个人博客，在这里我会分享技术心得、生活感悟和各种有趣的内容。",
               },
             ],
           },
@@ -184,7 +184,7 @@ async function main() {
       },
       {
         type: "project",
-        title: "lankHub 个人博客",
+        title: "QingHub 个人博客",
         description:
           "基于 Next.js + Prisma + SQLite 构建的全栈博客系统，支持用户认证、文章管理、富文本编辑、评论功能。",
         techStack: "Next.js · TypeScript · Prisma · TailwindCSS",

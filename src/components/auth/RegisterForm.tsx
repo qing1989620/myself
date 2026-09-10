@@ -81,7 +81,7 @@ export default function RegisterForm() {
     <div className="w-full max-w-md mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">创建账号</h1>
-        <p className="text-gray-500 mt-2">注册 lankHub，加入我们的社区</p>
+        <p className="text-gray-500 mt-2">注册 QingHub，加入我们的社区</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">

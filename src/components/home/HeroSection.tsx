@@ -17,14 +17,14 @@ export default function HeroSection() {
       <div className="relative z-10 space-y-8">
         {/* Avatar placeholder */}
         <div className="mx-auto w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center ring-4 ring-gray-200">
-          <span className="text-3xl font-bold text-brand-navy">L</span>
+          <span className="text-3xl font-bold text-brand-navy">Q</span>
         </div>
 
         <div className="space-y-4">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">
             你好，我是{" "}
             <span className="text-gray-900">
-              lank
+              Qing
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-gray-500 max-w-lg mx-auto">

@@ -18,11 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const collection = await prisma.collection.findUnique({ where: { slug } })
 
   if (!collection) {
-    return { title: "合集不存在 - lankHub" }
+    return { title: "合集不存在 - QingHub" }
   }
 
   return {
-    title: `${collection.name} - lankHub`,
+    title: `${collection.name} - QingHub`,
     description: collection.description || `浏览合集"${collection.name}"中的所有文章`,
   }
 }

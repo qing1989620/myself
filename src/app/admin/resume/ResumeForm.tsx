@@ -720,7 +720,7 @@ export default function ResumeForm({ initialData }: ResumeFormProps) {
           items={projects}
           onChange={setProjects}
           fields={[
-            { key: "title", label: "项目名称", placeholder: "lankHub 个人博客" },
+            { key: "title", label: "项目名称", placeholder: "QingHub 个人博客" },
             { key: "startDate", label: "开始", placeholder: "2024" },
             { key: "endDate", label: "结束", placeholder: "至今" },
             { key: "description", label: "描述", placeholder: "项目介绍..." },
