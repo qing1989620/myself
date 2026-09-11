@@ -257,6 +257,33 @@ myself/
 └── public/               # 静态资源
 ```
 
+## 部署到 Vercel（推荐，免费）
+
+仓库已做双数据库适配：`DATABASE_URL` 以 `file:` 开头走本地 SQLite，以 `postgres` 开头走 PostgreSQL，
+本地开发与云端部署互不影响。
+
+1. 在 Vercel **Add New → Project** 导入本仓库（`qing1989620/myself`）；
+2. 先到 **Storage → Create Database → Postgres（Neon）** 建库并连接本项目，
+   `DATABASE_URL` 会自动注入到环境变量；
+3. 在 **Settings → Environment Variables** 检查：
+   - `DATABASE_URL`：Postgres 连接串（Storage 连接后自动注入，**不要**用 `.env` 里的 file: 地址）
+   - `AUTH_SECRET`：**务必更换**，`openssl rand -base64 32`（仓库内 .env 里的值已公开）
+   - `NEXTAUTH_URL` / `NEXT_PUBLIC_SITE_URL`：正式域名（如 `https://qinghub.vercel.app`）
+4. **Deploy**。构建命令由 `vercel.json` 指定：自动用 postgres 版 schema 生成客户端并 `db push` 建表。
+
+首次部署后数据库为空，本地执行一次种子脚本填充（`DATABASE_URL` 指向线上库）：
+
+```bash
+DATABASE_URL="postgres://..." npx tsx prisma/seed.ts
+DATABASE_URL="postgres://..." npx tsx prisma/seed-resume.ts
+DATABASE_URL="postgres://..." npx tsx prisma/seed-article-uav.ts
+DATABASE_URL="postgres://..." npm run reset-password
+```
+
+> Serverless 无法写本地文件：后台的「图片上传 / 简历 PDF 上传」在 Vercel 上不可用。
+> 更新简历 PDF 的方式是替换 `public/uploads/resume-*.pdf` 后推送；
+> 评论、浏览量、后台编辑文字内容均走数据库，正常可用。
+
 ## License
 
 MIT

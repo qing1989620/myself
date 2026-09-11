@@ -30,22 +30,27 @@ const prisma = new PrismaClient({ adapter })
 
 const root = path.resolve(__dirname, "..")
 
-/** 1. 复制简历 PDF 到 data/uploads/（文件名需匹配 /uploads/resume-{id}.pdf） */
+/** 1. 复制简历 PDF：data/uploads/（本地 API 读取）+ public/uploads/（随 git 部署到云端） */
 function installPdf(): string | null {
   const src = process.env.RESUME_PDF
   if (!src || !fs.existsSync(src)) {
     console.warn("未提供 RESUME_PDF 或文件不存在，跳过 PDF 安装")
     return null
   }
-  const uploadDir = path.join(root, "data", "uploads")
-  fs.mkdirSync(uploadDir, { recursive: true })
 
-  // 删除旧的简历文件
-  const old = fs.readdirSync(uploadDir).filter((f) => /^resume-[A-Za-z0-9-]+\.pdf$/.test(f))
-  for (const f of old) fs.unlinkSync(path.join(uploadDir, f))
+  // 删除两处的旧简历文件
+  for (const dir of [
+    path.join(root, "data", "uploads"),
+    path.join(root, "public", "uploads"),
+  ]) {
+    fs.mkdirSync(dir, { recursive: true })
+    const old = fs.readdirSync(dir).filter((f) => /^resume-[A-Za-z0-9-]+\.pdf$/.test(f))
+    for (const f of old) fs.unlinkSync(path.join(dir, f))
+  }
 
   const filename = `resume-${crypto.randomUUID()}.pdf`
-  fs.copyFileSync(src, path.join(uploadDir, filename))
+  fs.copyFileSync(src, path.join(root, "data", "uploads", filename))
+  fs.copyFileSync(src, path.join(root, "public", "uploads", filename))
   console.log("PDF 已安装:", filename)
   return `/uploads/${filename}`
 }
