@@ -338,6 +338,16 @@ const experiences = [
   },
 ]
 
+/** 1b. 未提供新 PDF 时，绑定仓库 public/uploads/ 里已有的简历文件（云端部署用） */
+function findExistingPublicResumePdf(): string | null {
+  const dir = path.join(root, "public", "uploads")
+  if (!fs.existsSync(dir)) return null
+  const found = fs
+    .readdirSync(dir)
+    .filter((f) => /^resume-[A-Za-z0-9-]+\.pdf$/.test(f))
+  return found.length ? `/uploads/${found[0]}` : null
+}
+
 async function main() {
   const resumePdf = installPdf()
 
@@ -345,8 +355,9 @@ async function main() {
 
   const fields = {
     ...profileData,
-    // 未安装新 PDF 时保留原有值
-    resumePdf: resumePdf ?? existing?.resumePdf ?? null,
+    // 优先级：新 PDF > 已有绑定 > 仓库 public/uploads/ 里的现成文件
+    resumePdf:
+      resumePdf ?? existing?.resumePdf ?? findExistingPublicResumePdf(),
   }
 
   const profile = existing
