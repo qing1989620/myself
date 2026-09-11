@@ -5,8 +5,7 @@ import path from "path"
 dotenvConfig({ path: path.resolve(__dirname, "..", ".env.local"), override: false })
 dotenvConfig({ path: path.resolve(__dirname, "..", ".env"), override: false })
 
-import { PrismaClient } from "../src/generated/prisma/client"
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3"
+import { createPrismaClient } from "./prisma-client"
 import bcrypt from "bcryptjs"
 import * as readline from "readline"
 
@@ -17,8 +16,7 @@ if (!process.env.DATABASE_URL) {
 
 const rawDbUrl = process.env.DATABASE_URL
 const dbUrl = path.resolve(rawDbUrl.replace("file:", ""))
-const adapter = new PrismaBetterSqlite3({ url: dbUrl })
-const prisma = new PrismaClient({ adapter })
+const prisma = createPrismaClient()
 
 function ask(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })

@@ -16,8 +16,7 @@ import crypto from "crypto"
 dotenvConfig({ path: path.resolve(__dirname, "..", ".env.local"), override: false })
 dotenvConfig({ path: path.resolve(__dirname, "..", ".env"), override: false })
 
-import { PrismaClient } from "../src/generated/prisma/client"
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3"
+import { createPrismaClient } from "./prisma-client"
 
 if (!process.env.DATABASE_URL) {
   console.error("未找到 DATABASE_URL，请在 .env 或 .env.local 中配置")
@@ -25,8 +24,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 const dbUrl = process.env.DATABASE_URL!.replace("file:", "")
-const adapter = new PrismaBetterSqlite3({ url: dbUrl })
-const prisma = new PrismaClient({ adapter })
+const prisma = createPrismaClient()
 
 const root = path.resolve(__dirname, "..")
 
