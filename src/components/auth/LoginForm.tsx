@@ -74,18 +74,18 @@ export default function LoginForm() {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 mb-1.5"
           >
-            邮箱
+            账号
           </label>
           <input
             id="email"
             name="email"
-            type="email"
-            autoComplete="email"
+            type="text"
+            autoComplete="username"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none transition-all text-sm"
-            placeholder="your@email.com"
+            placeholder="账号或邮箱"
           />
         </div>
 

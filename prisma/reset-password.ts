@@ -14,9 +14,14 @@ if (!process.env.DATABASE_URL) {
   process.exit(1)
 }
 
-const rawDbUrl = process.env.DATABASE_URL
-const dbUrl = path.resolve(rawDbUrl.replace("file:", ""))
 const prisma = createPrismaClient()
+
+// 账号可通过环境变量或第一个命令行参数指定，默认为 admin@lankhub.com
+const targetEmail = (
+  process.argv[2] ||
+  process.env.SEED_ADMIN_EMAIL ||
+  "admin@lankhub.com"
+).toLowerCase()
 
 function ask(question: string): Promise<string> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
@@ -29,44 +34,52 @@ function ask(question: string): Promise<string> {
 }
 
 async function main() {
-  console.log("=== QingHub 重置站长密码 ===\n")
+  console.log("=== QingHub 重置密码 ===\n")
 
-  // 查找站长账号（默认邮箱 admin@lankhub.com）
-  const owner = await prisma.user.findFirst({
-    where: { email: "admin@lankhub.com" },
+  const user = await prisma.user.findUnique({
+    where: { email: targetEmail },
   })
 
-  if (!owner) {
-    console.log("❌ 没有找到站长账号（admin@lankhub.com）")
+  if (!user) {
+    console.log(`❌ 没有找到账号（${targetEmail}）`)
+    console.log("   可用账号：")
+    const users = await prisma.user.findMany({ select: { email: true, name: true } })
+    for (const u of users) console.log(`   - ${u.email} (${u.name})`)
     process.exit(1)
   }
 
-  console.log(`找到站长账号: ${owner.email} (${owner.name})\n`)
+  console.log(`找到账号: ${user.email} (${user.name})\n`)
 
-  // 输入新密码
-  let newPassword = ""
-  while (newPassword.length < 6) {
-    newPassword = await ask("请输入新密码（至少 6 位）: ")
+  // 密码可用第二个命令行参数传入（非交互），否则进入交互式输入
+  let newPassword = process.argv[3] || ""
+
+  if (newPassword) {
     if (newPassword.length < 6) {
-      console.log("密码太短，请至少输入 6 位\n")
+      console.log("❌ 密码太短，至少 6 位")
+      process.exit(1)
     }
-  }
-
-  const confirm = await ask("确认修改？(y/n): ")
-  if (confirm.toLowerCase() !== "y") {
-    console.log("已取消")
-    process.exit(0)
+  } else {
+    while (newPassword.length < 6) {
+      newPassword = await ask("请输入新密码（至少 6 位）: ")
+      if (newPassword.length < 6) {
+        console.log("密码太短，请至少输入 6 位\n")
+      }
+    }
+    const confirm = await ask("确认修改？(y/n): ")
+    if (confirm.toLowerCase() !== "y") {
+      console.log("已取消")
+      process.exit(0)
+    }
   }
 
   const hashed = await bcrypt.hash(newPassword, 10)
   await prisma.user.update({
-    where: { id: owner.id },
+    where: { id: user.id },
     data: { password: hashed },
   })
 
   console.log(`\n✅ 密码已更新！`)
-  console.log(`   邮箱: ${owner.email}`)
-  console.log(`   新密码: ${newPassword}`)
+  console.log(`   账号: ${user.email}`)
 }
 
 main()
