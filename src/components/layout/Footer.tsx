@@ -72,17 +72,6 @@ export default function Footer() {
             <Heart size={12} className="text-red-400" />
             · 记录成长，分享生活
           </p>
-          {/* ICP 备案（国内服务器合规要求，链接指向工信部） */}
-          <p className="text-xs text-gray-400 mt-2">
-            <a
-              href="https://beian.miit.gov.cn"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-600 transition-colors"
-            >
-              湘ICP备2026026981号-1
-            </a>
-          </p>
         </div>
       </div>
     </footer>
